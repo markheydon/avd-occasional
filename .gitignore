@@ -1,0 +1,25 @@
+# Azure & Bicep
+.terraform/
+*.tfstate
+*.tfstate.*
+.env
+.env.local
+bicep-param-*.json
+
+# PowerShell
+*.ps1xml
+.PSRepository/
+
+# IDE
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Deployment artifacts
+deployment-output.json
+*.log
