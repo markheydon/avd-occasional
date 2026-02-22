@@ -1,0 +1,42 @@
+name: Bicep Lint
+
+on:
+  push:
+    paths:
+      - "infra/**"
+  pull_request:
+    paths:
+      - "infra/**"
+
+jobs:
+  lint-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Azure CLI
+        run: |
+          set -euo pipefail
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+      - name: Bicep version
+        run: az bicep version
+
+      - name: Lint Bicep files
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(find infra -type f -name "*.bicep")
+          for file in "${files[@]}"; do
+            echo "Linting $file"
+            az bicep lint --file "$file"
+          done
+
+      - name: Build Bicep files
+        run: |
+          set -euo pipefail
+          mapfile -t files < <(find infra -type f -name "*.bicep")
+          for file in "${files[@]}"; do
+            echo "Building $file"
+            az bicep build --file "$file" --stdout > /dev/null
+          done

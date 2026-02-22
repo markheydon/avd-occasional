@@ -344,7 +344,7 @@ az group delete --name avd-occasional-rg --yes
 
 ## Cost Analysis
 
-_**⚠️ NOTE **: The following cost analysis is based on UK pricing around Februrary 2026 and should be used an an example only. You should the official [Pricing Calculator](https://azure.microsoft.com/en-us/pricing/calculator/) for accurate estimates of what your costs might if you deploy this to your Azure environment._
+_**⚠️ IMPORTANT NOTE**: The following cost analysis is based on UK pricing around Februrary 2026 and should be used an an example only. You should the official [Pricing Calculator](https://azure.microsoft.com/en-us/pricing/calculator/) for accurate estimates of what your costs might if you deploy this to your Azure environment._
 
 ### Component Cost Breakdown (Monthly)
 
