@@ -6,6 +6,9 @@
 .env.local
 bicep-param-*.json
 
+# Bicep build outputs
+infra/main.json
+
 # PowerShell
 *.ps1xml
 .PSRepository/

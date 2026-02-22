@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": {
+      "value": "dev"
+    },
+    "workloadSize": {
+      "value": "moderate"
+    },
+    "location": {
+      "value": "ukwest"
+    },
+    "vmCount": {
+      "value": 1
+    },
+    "adminUsername": {
+      "value": "avdadmin"
+    },
+    "tags": {
+      "value": {
+        "environment": "dev",
+        "project": "avd-occasional",
+        "costCenter": "personal",
+        "autoscale": "manual",
+        "managedBy": "bicep"
+      }
+    },
+    "artifactsLocation": {
+      "value": "https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02774.414.zip"
+    }
+  }
+}
