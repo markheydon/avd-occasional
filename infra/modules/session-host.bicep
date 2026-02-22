@@ -31,7 +31,7 @@ var vmNamePrefix = '${resourcePrefix}-vm'
 var nicNamePrefix = '${resourcePrefix}-nic'
 var osDiskNamePrefix = '${resourcePrefix}-osdisk'
 var uniqueSuffix = uniqueString(resourceGroup().id)
-var avdInstallCommand = 'powershell -Command "& {$downloadPath = \'C:\\temp\'; $agentMsi = Join-Path $downloadPath \'AVDAgent.msi\'; $loaderMsi = Join-Path $downloadPath \'AVDBootLoader.msi\'; $web = New-Object System.Net.WebClient; Write-Host \'Installing AVD Agent...\'; $web.DownloadFile(\'https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RW14ZwG\', $agentMsi); Start-Process -FilePath msiexec.exe -ArgumentList \'/i $agentMsi /quiet /norestart\' -Wait; Write-Host \'Installing AVD BootLoader...\'; $web.DownloadFile(\'https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RW14ZwG\', $loaderMsi); Start-Process -FilePath msiexec.exe -ArgumentList \'/i $loaderMsi /quiet /norestart\' -Wait; Remove-Item -Path $agentMsi -Force -ErrorAction SilentlyContinue; Remove-Item -Path $loaderMsi -Force -ErrorAction SilentlyContinue; Write-Host \'AVD installation complete.\'}"'
+var avdInstallCommand = 'powershell -Command "& {$downloadPath = \'C:\\temp\'; $agentMsi = Join-Path $downloadPath \'AVDAgent.msi\'; $loaderMsi = Join-Path $downloadPath \'AVDBootLoader.msi\'; $web = New-Object System.Net.WebClient; Write-Host \'Installing AVD Agent...\'; $web.DownloadFile(\'https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv\', $agentMsi); Start-Process -FilePath msiexec.exe -ArgumentList \'/i $agentMsi /quiet /norestart\' -Wait; Write-Host \'Installing AVD BootLoader...\'; $web.DownloadFile(\'https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH\', $loaderMsi); Start-Process -FilePath msiexec.exe -ArgumentList \'/i $loaderMsi /quiet /norestart\' -Wait; Remove-Item -Path $agentMsi -Force -ErrorAction SilentlyContinue; Remove-Item -Path $loaderMsi -Force -ErrorAction SilentlyContinue; Write-Host \'AVD installation complete.\'}"'
 
 // ===================================
 // Resources - Network Interfaces
@@ -142,6 +142,27 @@ resource avdExtension 'Microsoft.Compute/virtualMachines/extensions@2025-04-01' 
 }]
 
 // ===================================
+// Extensions - AAD Join (Entra ID)
+// ===================================
+
+resource aadLoginExtension 'Microsoft.Compute/virtualMachines/extensions@2024-03-01' = [for i in range(0, vmCount): {
+  parent: vmResources[i]
+  name: 'AADLoginForWindows'
+  location: location
+  tags: tags
+  properties: {
+    publisher: 'Microsoft.Azure.ActiveDirectory'
+    type: 'AADLoginForWindows'
+    typeHandlerVersion: '2.0'
+    autoUpgradeMinorVersion: true
+    enableAutomaticUpgrade: false
+  }
+  dependsOn: [
+    vmResources
+  ]
+}]
+
+// ===================================
 // Extensions - Join VM to AVD Host Pool
 // ===================================
 resource avdJoinExtension 'Microsoft.Compute/virtualMachines/extensions@2025-04-01' = [for i in range(0, vmCount): {
@@ -150,7 +171,8 @@ resource avdJoinExtension 'Microsoft.Compute/virtualMachines/extensions@2025-04-
   location: location
   tags: tags
   dependsOn: [
-    vmResources[i]
+    aadLoginExtension[i]
+    avdExtension[i]
   ]
   properties: {
     publisher: 'Microsoft.Powershell'

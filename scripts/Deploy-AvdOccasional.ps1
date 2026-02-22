@@ -86,10 +86,19 @@ if ($LASTEXITCODE -eq 0) {
     else {
         Write-Host "Deployment completed successfully!" -ForegroundColor Green
         Write-Host ""
+        Write-Host "IMPORTANT: Configure access before connecting" -ForegroundColor Yellow
+        Write-Host "Two role assignments are required for Entra ID-joined AVD:" -ForegroundColor Yellow
+        Write-Host ""
         Write-Host "Next steps:" -ForegroundColor Cyan
-        Write-Host "1. Check Azure Portal: Resource Groups > $ResourceGroupName"
-        Write-Host "2. Get session host IPs: az vm list-ip-addresses --resource-group $ResourceGroupName"
-        Write-Host "3. Connect to AVD portal and add your Entra ID user to the desktop"
+        Write-Host "1. Assign 'Desktop Virtualization User' role to Application Group"
+        Write-Host "   - Portal: Resource Groups > $ResourceGroupName > Desktop App Group > IAM"
+        Write-Host ""
+        Write-Host "2. Assign 'Virtual Machine User Login' role to each VM"
+        Write-Host "   - Portal: Resource Groups > $ResourceGroupName > VM > IAM"
+        Write-Host "   - CLI: See README.md for PowerShell commands"
+        Write-Host ""
+        Write-Host "3. Wait 5-10 minutes for role propagation"
+        Write-Host ""
         Write-Host "4. Launch Windows App and connect to 'Personal Desktop'"
         Write-Host ""
         Write-Host "To stop VMs (save cost): .\scripts\Stop-AvdOccasional.ps1 -ResourceGroupName $ResourceGroupName"

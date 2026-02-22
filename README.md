@@ -111,11 +111,18 @@ Requires additional setup for RDP Shortpath (not recommended for occasional use)
 
 ## ⚠️ Important: Role Assignments Required
 
-**This template does NOT automatically assign roles.** After deployment, you must manually configure access or users will not be able to connect to the AVD resources.
+**This template does NOT automatically assign roles.** After deployment, you must manually configure **TWO separate role assignments** or users will not be able to connect to the AVD resources.
 
-### Manual Post-Deployment Configuration
+### Required Role Assignments
 
-To enable user access, you must assign the **Desktop Virtualization User** role:
+For Entra ID-joined AVD deployments, users need **two roles**:
+
+1. **Desktop Virtualization User** - Grants access to the AVD workspace and application group
+2. **Virtual Machine User Login** - Allows login to the Entra ID-joined session host VMs
+
+### 1. Assign Desktop Virtualization User Role
+
+This role allows users to see and access the AVD workspace:
 
 **In Azure Portal:**
 
@@ -139,12 +146,55 @@ az role assignment create `
   --scope $appGroupId
 ```
 
-**Without these role assignments, users will not be able to:**
+**Without this role assignment, users will not be able to:**
 - See the workspace in Windows App.
 - Connect to the personal desktop.
 - Launch sessions.
 
-Allow 5-10 minutes after assignment for role propagation before attempting to connect.
+### 2. Assign VM Login Role
+
+This role allows users to actually log into the Entra ID-joined VM after connecting:
+
+**In Azure Portal:**
+
+1. Navigate to Resource Groups > `avd-occasional-rg`.
+2. Find the **Virtual Machine**: `avd-dev-vm-0-*`.
+3. Open the VM and go to **Access control (IAM)**.
+4. Click **+ Add > Add role assignment**.
+5. Select **Virtual Machine User Login** role (or **Virtual Machine Administrator Login** for admin access).
+6. Assign to your Entra ID user account(s).
+7. Click **Save**.
+
+**Via Azure CLI:**
+
+```powershell
+# Get your user ID
+$userId = (az ad signed-in-user show --query id -o tsv)
+
+# Get the VM resource ID
+$vmId = (az vm show --resource-group avd-occasional-rg --name avd-dev-vm-0-* --query id -o tsv)
+
+# Assign Virtual Machine User Login role
+az role assignment create `
+  --role "Virtual Machine User Login" `
+  --assignee $userId `
+  --scope $vmId
+```
+
+**For administrator access instead:**
+```powershell
+az role assignment create `
+  --role "Virtual Machine Administrator Login" `
+  --assignee $userId `
+  --scope $vmId
+```
+
+**Without this role assignment:**
+- Users will see: "Your account is configured to prevent you from using this device"
+- Login will fail even after successfully connecting to AVD
+- This is required for all Entra ID-joined VMs
+
+**Summary:** Allow 5-10 minutes after both role assignments for propagation before attempting to connect.
 
 ---
 

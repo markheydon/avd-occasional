@@ -9,8 +9,8 @@ param appGroupName string
 param location string
 param tags object
 
-@description('Token expiration time (default: 2 hours from deployment)')
-param tokenExpirationTime string = dateTimeAdd(utcNow('u'), 'PT2H')
+@description('Token expiration time (default: 27 days from deployment)')
+param tokenExpirationTime string = dateTimeAdd(utcNow('u'), 'P27D')
 
 // ===================================
 // Resources - Host Pool
