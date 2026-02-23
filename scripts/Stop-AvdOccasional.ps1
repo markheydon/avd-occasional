@@ -51,21 +51,23 @@ foreach ($vm in $vms) {
         
         if ($pipId) {
             $pipName = ($pipId -split '/')[-1]
-            Write-Host "  Removing Public IP from $vm..." -ForegroundColor Yellow
+            Write-Host "  Removing Public IP ($pipName) from $vm..." -ForegroundColor Yellow
             
-            # Disassociate Public IP from NIC
+            # Disassociate Public IP from NIC (must wait for this to complete)
             az network nic ip-config update `
                 --resource-group $ResourceGroupName `
                 --nic-name $nicName `
                 --name ipconfig1 `
                 --remove publicIpAddress 2>$null | Out-Null
             
+            # Wait a moment for disassociation to complete
+            Start-Sleep -Seconds 2
+            
             # Delete the Public IP to stop billing
             Write-Host "  Deleting Public IP $pipName..." -ForegroundColor Yellow
             az network public-ip delete `
                 --resource-group $ResourceGroupName `
-                --name $pipName `
-                --no-wait 2>$null
+                --name $pipName 2>$null
         }
         else {
             Write-Host "  No Public IP found for $vm" -ForegroundColor Gray

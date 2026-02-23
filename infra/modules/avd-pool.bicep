@@ -30,7 +30,7 @@ resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2024-04-03' = {
     maxSessionLimit: 1
     loadBalancerType: 'Persistent'
     startVMOnConnect: false
-    customRdpProperty: 'targetisaadjoined:i:1;audiomode:i:0;videoplaybackmode:i:1;redirectclipboard:i:1;enablecredsspsupport:i:1;redirectwebauthn:i:1;use multimon:i:1;'
+    customRdpProperty: 'targetisaadjoined:i:1;enablerdsaadauth:i:1;audiomode:i:0;videoplaybackmode:i:1;redirectclipboard:i:1;enablecredsspsupport:i:1;redirectwebauthn:i:1;use multimon:i:1;'
     registrationInfo: {
       expirationTime: tokenExpirationTime
       registrationTokenOperation: 'Update'

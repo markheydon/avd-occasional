@@ -36,25 +36,43 @@ foreach ($vm in $vms) {
     if ($nicId) {
         $nicName = ($nicId -split '/')[-1]
         
-        # Check if Public IP already exists
+        # Check if Public IP already associated
         $existingPipId = az network nic show --ids $nicId --query "ipConfigurations[0].publicIpAddress.id" -o tsv 2>$null
         
         if (-not $existingPipId) {
-            # Create Public IP with naming convention matching Bicep template
-            $pipName = "$nicName-pip"
-            Write-Host "  Creating Public IP for $vm..." -ForegroundColor Yellow
+            # Extract the NIC index and suffix from the NIC name (e.g., avd-dev-nic-0-zx4itrg75d2kc)
+            if ($nicName -match '(.+)-nic-(\d+)-(.+)') {
+                $prefix = $matches[1]
+                $index = $matches[2]
+                $suffix = $matches[3]
+                $pipName = "$prefix-pip-$index-$suffix"
+            } else {
+                # Fallback to simple naming if pattern doesn't match
+                $pipName = "$nicName-pip"
+            }
             
-            $pipId = az network public-ip create `
+            # Check if the PIP already exists in the resource group (deleted from NIC but not from RG)
+            $existingPip = az network public-ip show `
                 --resource-group $ResourceGroupName `
                 --name $pipName `
-                --sku Standard `
-                --allocation-method Static `
-                --version IPv4 `
-                --query "publicIp.id" -o tsv 2>$null
+                --query "id" -o tsv 2>$null
+            
+            if ($existingPip) {
+                Write-Host "  Re-associating existing Public IP ($pipName) to $vm..." -ForegroundColor Yellow
+                $pipId = $existingPip
+            } else {
+                Write-Host "  Creating Public IP ($pipName) for $vm..." -ForegroundColor Yellow
+                $pipId = az network public-ip create `
+                    --resource-group $ResourceGroupName `
+                    --name $pipName `
+                    --sku Standard `
+                    --allocation-method Static `
+                    --version IPv4 `
+                    --query "publicIp.id" -o tsv 2>$null
+            }
             
             if ($pipId) {
                 # Associate Public IP to NIC
-                Write-Host "  Associating Public IP to $vm..." -ForegroundColor Yellow
                 az network nic ip-config update `
                     --resource-group $ResourceGroupName `
                     --nic-name $nicName `
@@ -63,7 +81,8 @@ foreach ($vm in $vms) {
             }
         }
         else {
-            Write-Host "  Public IP already exists for $vm" -ForegroundColor Gray
+            $existingPipName = ($existingPipId -split '/')[-1]
+            Write-Host "  Public IP ($existingPipName) already associated with $vm" -ForegroundColor Gray
         }
     }
 }
