@@ -92,6 +92,9 @@ resource networkInterfaces 'Microsoft.Network/networkInterfaces@2024-01-01' = [f
 // Resources - Session Host VMs
 // ===================================
 
+// Note: Windows computer names have a maximum length of 15 characters,
+// so we truncate the unique suffix to ensure compliance.
+var computerNames = [for i in range(0, vmCount): toLower(substring('${vmNamePrefix}-${i}-${uniqueSuffix}', 0, 15))]
 resource vmResources 'Microsoft.Compute/virtualMachines@2025-04-01' = [for i in range(0, vmCount): {
   name: '${vmNamePrefix}-${i}-${uniqueSuffix}'
   location: location
@@ -111,7 +114,7 @@ resource vmResources 'Microsoft.Compute/virtualMachines@2025-04-01' = [for i in 
       }
     }
     osProfile: {
-      computerName: '${vmNamePrefix}-${i}'
+      computerName: computerNames[i]
       adminUsername: adminUsername
       adminPassword: adminPassword
       windowsConfiguration: {
