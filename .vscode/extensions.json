@@ -1,0 +1,7 @@
+{
+    "recommendations": [
+        "ms-azuretools.vscode-bicep",
+        "ms-vscode.powershell",
+        "github.vscode-github-actions"
+    ]
+}

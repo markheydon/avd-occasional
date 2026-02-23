@@ -6,6 +6,9 @@
 .env.local
 bicep-param-*.json
 
+# Bicep build outputs
+infra/main.json
+
 # PowerShell
 *.ps1xml
 .PSRepository/
@@ -23,3 +26,9 @@ Thumbs.db
 # Deployment artifacts
 deployment-output.json
 *.log
+
+# Local Jekyll testing
+Gemfile
+Gemfile.lock
+_site/
+docs/.sass-cache
