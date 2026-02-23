@@ -42,7 +42,7 @@ var uniqueSuffix = uniqueString(resourceGroup().id)
 // Resources - Public IP Addresses
 // ===================================
 
-resource publicIPs 'Microsoft.Network/publicIPAddresses@2025-01-01' = [for i in range(0, vmCount): {
+resource publicIPs 'Microsoft.Network/publicIPAddresses@2025-05-01' = [for i in range(0, vmCount): {
   name: '${resourcePrefix}-pip-${i}-${uniqueSuffix}'
   location: location
   tags: tags
@@ -62,7 +62,7 @@ resource publicIPs 'Microsoft.Network/publicIPAddresses@2025-01-01' = [for i in 
 // Resources - Network Interfaces
 // ===================================
 
-resource networkInterfaces 'Microsoft.Network/networkInterfaces@2025-01-01' = [for i in range(0, vmCount): {
+resource networkInterfaces 'Microsoft.Network/networkInterfaces@2025-05-01' = [for i in range(0, vmCount): {
   name: '${nicNamePrefix}-${i}-${uniqueSuffix}'
   location: location
   tags: tags

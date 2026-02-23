@@ -24,7 +24,7 @@ var subnetAddressPrefix = '10.0.1.0/24'
 // Resources
 // ===================================
 
-resource vnet 'Microsoft.Network/virtualNetworks@2024-01-01' = {
+resource vnet 'Microsoft.Network/virtualNetworks@2025-05-01' = {
   name: vnetName
   location: location
   tags: tags
