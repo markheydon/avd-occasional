@@ -119,7 +119,7 @@ resource vmResources 'Microsoft.Compute/virtualMachines@2025-04-01' = [for i in 
         patchSettings: {
           patchMode: 'AutomaticByOS'
         }
-        timeZone: 'Europe/London'
+        timeZone: 'UTC'
       }
       allowExtensionOperations: true
     }
