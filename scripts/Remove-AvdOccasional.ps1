@@ -10,7 +10,8 @@ param(
 
 # Check if resource group exists before attempting deletion
 Write-Host "Checking if resource group exists..." -ForegroundColor Cyan
-if (-not (az group show --name $ResourceGroupName 2>$null)) {
+$na = az group show --name $ResourceGroupName 2>$null
+if (-not $na) {
     Write-Host "Resource group not found. Nothing to delete." -ForegroundColor Yellow
     return
 }
@@ -40,7 +41,8 @@ $intervalSeconds = 10
 $elapsed = 0
 
 while ($elapsed -lt $timeoutSeconds) {
-    if (az group show --name $ResourceGroupName 2>$null) {
+    $na = az group show --name $ResourceGroupName 2>$null
+    if ($na) {
         Write-Host "  Resource group still exists. Waiting..." -ForegroundColor Yellow
         Start-Sleep -Seconds $intervalSeconds
         $elapsed += $intervalSeconds
