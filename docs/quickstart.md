@@ -75,7 +75,7 @@ foreach ($vmId in $vmIds) {
 
 ## 4. Connect to Your Desktop
 
-1. Install [Windows App](https://apps.microsoft.com/store/detail/windows-app/9MZQD45HFDX) from Microsoft Store.
+1. Install [Windows App](https://apps.microsoft.com/detail/9n1f85v9t8bn) from Microsoft Store.
 2. Open Windows App and sign in with your Entra ID account.
 3. Select the "Personal Desktop" workspace.
 4. Launch your desktop.
@@ -87,6 +87,8 @@ You're now connected and can start working!
 ### Save Costs Between Sessions
 
 When finished working, deallocate VMs to save ~98% on compute costs:
+
+**⚠️ Your desktop, files, and applications are fully preserved. Only VM compute is paused, disks remain.**
 
 ```powershell
 .\scripts\Stop-AvdOccasional.ps1
@@ -112,3 +114,7 @@ See [Troubleshooting Guide](troubleshooting.md) for common problems and solution
 ---
 
 **Estimated time to first connection**: 25–30 minutes (15–20 min deployment + 5–10 min role propagation).
+
+---
+
+**Last Updated**: February 2026

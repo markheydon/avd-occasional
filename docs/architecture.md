@@ -101,6 +101,9 @@ Internet User
 
 ## Cost Model
 
+**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publically in February 2026
+and are subject to change by Microsoft at any time. You should use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
+
 ### Monthly Costs by Component
 
 | Component | Deallocated | Running | Notes |

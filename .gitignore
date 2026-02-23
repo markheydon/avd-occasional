@@ -31,3 +31,4 @@ deployment-output.json
 Gemfile
 Gemfile.lock
 _site/
+docs/.sass-cache

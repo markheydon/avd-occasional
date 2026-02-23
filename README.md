@@ -8,27 +8,20 @@ Cost-effective **Azure Virtual Desktop** infrastructure for occasional remote wo
 
 **⚠️ Important**: This template deploys **Entra ID-joined VMs** (cloud-native, no on-premises AD required). All communication is via secure reverse connections—no RDP ports exposed.
 
-## Quick Links
+## Documentation
 
-| What You Want to Do | Go To |
-|-------------------|-------|
-| **Get running in 5 minutes** | [Quick Start Guide](docs/quickstart.md) |
-| **Understand prerequisites** | [Prerequisites Guide](docs/prerequisites.md) |
-| **Learn how it works** | [Architecture Overview](docs/architecture.md) |
-| **Detailed deployment steps** | [Detailed Deployment Guide](docs/deployment-detailed.md) |
-| **Fix an issue** | [Troubleshooting Guide](docs/troubleshooting.md) |
-| **Use PowerShell scripts** | [Scripts Reference](docs/scripts.md) |
-| **Full web documentation** | [GitHub Pages Docs](https://markheydon.github.io/avd-occasional) |
+For full documentation, guides, and troubleshooting, visit the [docs](https://markheydon.github.io/avd-occasional).
 
-## Cost at a Glance
+## Key Features
 
-| State | Monthly Cost | When To Use |
-|-------|-------------|-----------|
-| Running | £94–126 | During work sessions |
-| Deallocated | £2–3 | Between sessions (instant resume) |
-| Deleted | £0 | Complete cleanup (15–20 min redeploy) |
+- ✅ **Bicep Infrastructure as Code** – Reproducible, auditable, version-controlled.
+- ✅ **Cost optimised** – 98% savings when deallocated.
+- ✅ **Entra ID-joined VMs** – Cloud-native, no on-premises AD required.
+- ✅ **Fully idempotent** – Safe to redeploy multiple times.
+- ✅ **Automated lifecycle scripts** – Deploy, start, stop, remove.
+- ✅ **Zero inbound access** – Reverse connections only, NSG included.
 
-**Bottom line:** Deallocate when done = 98% cost savings. Resume in 2–3 minutes.
+---
 
 ## Quick Start
 
@@ -45,13 +38,11 @@ Cost-effective **Azure Virtual Desktop** infrastructure for occasional remote wo
 
 ```powershell
 az login
-# Select subscription if you have multiple
-az account set --subscription <subscription-id>
 ```
 
 ### 2. Review Parameters
 
-Edit `infra/parameters.json` to customize:
+Edit `infra/parameters.json` to customise:
 - `environment`: "dev" (for testing).
 - `workloadSize`: "moderate" (or "light" for lighter workload).
 - `location`: "ukwest" (or your preferred region).
@@ -65,21 +56,19 @@ The deployment requires admin credentials for the session host VMs. Create a sec
 $adminPassword = Read-Host "Enter admin password for session hosts" -AsSecureString
 ```
 
-> **Security Note**: This password is used for local VM administration only and is not stored in parameters.json. It's required during deployment and should be a strong, unique password.
+_**Security Note**: This password is used for local VM administration only and is not stored in parameters.json. It's required during deployment and should be a strong, unique password._
 
 ### 4. Deploy Infrastructure (Dry Run)
 
 Test the deployment without creating resources:
 
 ```powershell
-$adminPassword = Read-Host "Enter admin password for session hosts" -AsSecureString
 .\scripts\Deploy-AvdOccasional.ps1 -AdminPassword $adminPassword -WhatIf
 ```
 
 ### 5. Deploy (Create Resources)
 
 ```powershell
-$adminPassword = Read-Host "Enter admin password for session hosts" -AsSecureString
 .\scripts\Deploy-AvdOccasional.ps1 -AdminPassword $adminPassword
 ```
 
@@ -97,17 +86,48 @@ az resource list --resource-group avd-occasional-rg
 az vm list-ip-addresses --resource-group avd-occasional-rg
 ```
 
+### 7. Assign Required Roles
+
+Assign the required roles to your Entra ID user for VM login and AVD access:
+
+```powershell
+# Get current user
+$userId = (az ad signed-in-user show --query id -o tsv)
+
+# Desktop Virtualization User role assignment
+$appGroupId = (az resource list --resource-group avd-occasional-rg `
+  --resource-type "Microsoft.DesktopVirtualization/applicationGroups" `
+  --query '[0].id' -o tsv)
+az role assignment create `
+  --role "Desktop Virtualization User" `
+  --assignee $userId `
+  --scope $appGroupId
+
+# Virtual Machine User Login role assignment
+$vmIds = @(az vm list --resource-group avd-occasional-rg --query '[].id' -o tsv)
+foreach ($vmId in $vmIds) {
+    az role assignment create `
+      --role "Virtual Machine User Login" `
+      --assignee $userId `
+      --scope $vmId
+}
+```
+
 ---
 
-## Key Features
+## Estimated Cost at a Glance
 
-- ✅ **Bicep Infrastructure as Code** – Reproducible, auditable, version-controlled.
-- ✅ **Cost optimised** – 98% savings when deallocated.
-- ✅ **Entra ID-joined VMs** – Cloud-native, no on-premises AD required.
-- ✅ **Fully idempotent** – Safe to redeploy multiple times.
-- ✅ **Automated lifecycle scripts** – Deploy, start, stop, remove.
-- ✅ **Zero inbound access** – Reverse connections only, NSG included.
-- ✅ **March 2026 compliant** – Explicit outbound connectivity via Standard Public IPs.
+**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publically in February 2026 and are subject to change by Microsoft at any time. You should use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
+
+| State | Monthly Cost | When To Use |
+|-------|-------------|-----------|
+| Running | £94–126 | During work sessions |
+| Deallocated | £2–3 | Between sessions (instant resume) |
+| Deleted | £0 | Complete cleanup (15–20 min redeploy) |
+
+**Bottom line:** Deallocate when done = 98% cost savings. Resume in 2–3 minutes.
+
+---
 
 ## For Contributors
 

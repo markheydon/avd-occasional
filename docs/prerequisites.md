@@ -96,9 +96,6 @@ The deployment requires a strong admin password for session host VMs:
 ```powershell
 # Interactive prompt (recommended)
 $adminPassword = Read-Host "Enter admin password for session hosts" -AsSecureString
-
-# Or generate a random strong password
-$adminPassword = ConvertTo-SecureString -String ([System.Web.Security.Membership]::GeneratePassword(16, 3)) -AsPlainText -Force
 ```
 
 ### Entra ID Authentication
@@ -225,3 +222,7 @@ After reviewing prerequisites, you're ready to deploy. Start with the [Quick Sta
 ---
 
 **Next**: [Quick Start Guide](quickstart.md)
+
+---
+
+**Last Updated**: February 2026

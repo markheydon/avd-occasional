@@ -18,7 +18,6 @@ Cost-effective **Azure Virtual Desktop** infrastructure for occasional work sess
 - **Infrastructure as Code** – Reproducible, version-controlled Bicep templates.
 - **Easy lifecycle** – Deploy once, deallocate/start as needed.
 - **Cloud-native** – Entra ID-joined VMs, no on-premises AD required.
-- **March 2026 compliant** – Explicit outbound connectivity with Standard Public IPs.
 
 ## 🚀 Quick Start (5 minutes)
 
@@ -59,6 +58,9 @@ az login
 
 ## 💰 Cost Profile
 
+**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publically in February 2026
+and are subject to change by Microsoft at any time. You should use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
+
 | State | Monthly Cost | Notes |
 |-------|-------------|-------|
 | **Deallocated** | £2–3 | VMs stopped, disks retained (instant resume) |
@@ -98,34 +100,33 @@ See [Detailed Deployment: Cost Analysis](deployment-detailed.md#cost-analysis) f
 
 **Key features:**
 - Entra ID-joined VMs (cloud-native, no VPN required).
-- No inbound public ports (reverse connection only)
-- Public IPs deleted when VMs stopped (cost optimisation)
-- Service Endpoints for optimised Azure service routing
-- Fully idempotent deployment
+- No inbound public ports (reverse connection only).
+- Public IPs deleted when VMs stopped (cost optimisation).
+- Service Endpoints for optimised Azure service routing.
+- Fully idempotent deployment.
 
 See [Architecture Overview](architecture.md) for detailed component descriptions.
 
 ## 🎯 Use Cases
 
-✅ **Remote work from alternate location** – Coffee shop, co-working, travel  
-✅ **Temporary compute needs** – Project work, testing, demos  
-✅ **Cost-sensitive scenarios** – Deallocate between sessions  
-✅ **Personal productivity** – Persistent desktop, cloud-native identity  
+✅ **Remote work from alternate location** – Coffee shop, co-working, travel.
+✅ **Temporary compute needs** – Project work, testing, demos.
+✅ **Cost-sensitive scenarios** – Deallocate between sessions.
+✅ **Personal productivity** – Persistent desktop, cloud-native identity.
 
-❌ **Not for:** Pooled multi-user scenarios  
-❌ **Not for:** Always-on production workloads
+❌ **Not for:** Pooled multi-user scenarios.
+❌ **Not for:** Always-on production workloads.
 
 ## 🔧 Key Features
 
-- ✅ **Bicep Infrastructure as Code** – Reproducible, auditable, version-controlled
-- ✅ **Parameterised configuration** – Switch workload size (light/moderate) in one parameter
-- ✅ **Personal desktop** – Single user, persistent configuration
-- ✅ **Entra ID authentication** – Cloud-native identity, supports passwordless auth
-- ✅ **Deallocate pattern** – Stop VMs to save costs, resume in 2–3 minutes
-- ✅ **Automated lifecycle scripts** – Deploy, start, deallocate, cleanup
-- ✅ **Minimal security** – Reverse connections, NSG included, no RDP ports
-- ✅ **UK-friendly defaults** – Region: `ukwest`, pricing in GBP
-- ✅ **March 2026 compliant** – Explicit outbound connectivity via Standard Public IPs
+- ✅ **Bicep Infrastructure as Code** – Reproducible, auditable, version-controlled.
+- ✅ **Parameterised configuration** – Switch workload size (light/moderate) in one parameter.
+- ✅ **Personal desktop** – Single user, persistent configuration.
+- ✅ **Entra ID authentication** – Cloud-native identity, supports passwordless auth.
+- ✅ **Deallocate pattern** – Stop VMs to save costs, resume in 2–3 minutes.
+- ✅ **Automated lifecycle scripts** – Deploy, start, deallocate, cleanup.
+- ✅ **Minimal security** – Reverse connections, NSG included, no RDP ports.
+- ✅ **UK-friendly defaults** – Region: `ukwest`, pricing in GBP _(Regionalising of VMs not yet available see #2)_.
 
 ## 📋 Prerequisites at a Glance
 
@@ -140,25 +141,38 @@ See [Architecture Overview](architecture.md) for detailed component descriptions
 
 For full prerequisite details, see [Prerequisites Guide](prerequisites.md).
 
-## 📖 Next Steps
+## � Documentation & Resources
 
-1. **New to this project?** Start with [Quick Start](quickstart.md)
-2. **Need environment setup?** See [Prerequisites](prerequisites.md)
-3. **Want to understand how it works?** Read [Architecture Overview](architecture.md)
-4. **Detailed walkthrough?** Follow [Detailed Deployment Guide](deployment-detailed.md)
-5. **Troubleshooting?** Check [Troubleshooting Guide](troubleshooting.md)
-6. **Using PowerShell scripts?** See [Scripts Reference](scripts.md)
+### Getting Started
 
-## 🤝 Contributing
+1. **New to this project?** Start with [Quick Start](quickstart.md).
+2. **Need environment setup?** See [Prerequisites](prerequisites.md).
+3. **Want to understand how it works?** Read [Architecture Overview](architecture.md).
+4. **Detailed walkthrough?** Follow [Detailed Deployment Guide](deployment-detailed.md).
+5. **Troubleshooting?** Check [Troubleshooting Guide](troubleshooting.md).
+6. **Using PowerShell scripts?** See [Scripts Reference](scripts.md).
 
-Found a bug or have an idea for improvement? See the main [GitHub repository](https://github.com/markheydon/avd-occasional) for contribution guidelines.
+### External Resources
 
-## 📄 License
+- [Azure Virtual Desktop Documentation](https://learn.microsoft.com/en-us/azure/virtual-desktop/)
+- [Azure Virtual Desktop Learn Path](https://learn.microsoft.com/en-us/training/paths/deploy-manage-azure-virtual-desktop/)
+- [Bicep Documentation](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/)
+- [Azure CLI Reference](https://learn.microsoft.com/en-us/cli/azure/)
+- [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/)
 
-MIT License – See [LICENSE](../LICENSE) for details.
+### Project Documentation
+
+- [CONTRIBUTING](../CONTRIBUTING.md) – Contribution guidelines
+- [CHANGELOG](../CHANGELOG.md) – Version history and release notes
+- [LICENSE](../LICENSE) – MIT License
+- [README](../README.md) – Project overview
+
+### GitHub
+
+- [Repository](https://github.com/markheydon/avd-occasional) – Source code and issue tracking
+- [Issues](https://github.com/markheydon/avd-occasional/issues) – Report bugs or request features
+- [Discussions](https://github.com/markheydon/avd-occasional/discussions) – Questions and ideas
 
 ---
 
-**Main Repository**: [github.com/markheydon/avd-occasional](https://github.com/markheydon/avd-occasional)  
 **Last Updated**: February 2026  
-**Current Version**: 1.0

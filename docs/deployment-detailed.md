@@ -157,6 +157,9 @@ Edit `infra/parameters.json` to customize deployment:
 
 **Common Customisations:**
 
+**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publically in February 2026
+and are subject to change by Microsoft at any time. You should use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
+
 | Parameter | Options | Default | Cost Impact |
 |-----------|---------|---------|------------|
 | `environment` | `dev`, `test`, `prod` | `dev` | None (affects naming) |
@@ -303,7 +306,7 @@ foreach ($vmId in $vmIds) {
 
 **Using Windows App (Recommended):**
 
-1. Install [Windows App](https://apps.microsoft.com/detail/windows-app/9MZQD45HFDX) from Microsoft Store
+1. Install [Windows App](https://apps.microsoft.com/detail/9n1f85v9t8bn) from Microsoft Store
 2. Launch Windows App
 3. Sign in with your Entra ID account
 4. (First time) Subscribe to workspace: `avd-dev` (or custom name based on environment parameter)

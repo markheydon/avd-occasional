@@ -79,7 +79,7 @@ az bicep build infra/main.bicep
 $params = Get-Content infra/parameters.json -Raw | ConvertFrom-Json
 ```
 
-4. Check that all resources are availa in your region:
+4. Check that all resources are available in your region:
 ```powershell
 az provider list --query "[?registrationState=='Registered'].namespace" -o tsv
 ```
@@ -536,3 +536,7 @@ If you cannot resolve the issue:
 ---
 
 **Next**: [PowerShell Scripts Reference](scripts.md)
+
+---
+
+**Last Updated**: February 2026
