@@ -1,11 +1,13 @@
 name: Bicep Lint
 
 on:
-  push:
+  pull_request:
     paths:
       - "infra/**"
       - "bicepconfig.json"
-  pull_request:
+  push:
+    branches:
+      - main
     paths:
       - "infra/**"
       - "bicepconfig.json"
