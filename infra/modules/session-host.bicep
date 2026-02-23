@@ -1,6 +1,12 @@
 // ===================================
 // Session Host (VM) Module
 // Creates AVD session host VMs
+// 
+// Optimized for occasional use personal desktops:
+// - Standard SSD for fast boot/performance (same cost as HDD)
+// - Trusted Launch for enhanced security (no extra cost)
+// - Automatic Windows Updates via platform orchestration
+// - Boot diagnostics enabled for troubleshooting
 // ===================================
 
 param resourcePrefix string
@@ -31,7 +37,26 @@ var vmNamePrefix = '${resourcePrefix}-vm'
 var nicNamePrefix = '${resourcePrefix}-nic'
 var osDiskNamePrefix = '${resourcePrefix}-osdisk'
 var uniqueSuffix = uniqueString(resourceGroup().id)
-var avdInstallCommand = 'powershell -Command "& {$downloadPath = \'C:\\temp\'; $agentMsi = Join-Path $downloadPath \'AVDAgent.msi\'; $loaderMsi = Join-Path $downloadPath \'AVDBootLoader.msi\'; $web = New-Object System.Net.WebClient; Write-Host \'Installing AVD Agent...\'; $web.DownloadFile(\'https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv\', $agentMsi); Start-Process -FilePath msiexec.exe -ArgumentList \'/i $agentMsi /quiet /norestart\' -Wait; Write-Host \'Installing AVD BootLoader...\'; $web.DownloadFile(\'https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH\', $loaderMsi); Start-Process -FilePath msiexec.exe -ArgumentList \'/i $loaderMsi /quiet /norestart\' -Wait; Remove-Item -Path $agentMsi -Force -ErrorAction SilentlyContinue; Remove-Item -Path $loaderMsi -Force -ErrorAction SilentlyContinue; Write-Host \'AVD installation complete.\'}"'
+
+// ===================================
+// Resources - Public IP Addresses
+// ===================================
+
+resource publicIPs 'Microsoft.Network/publicIPAddresses@2024-01-01' = [for i in range(0, vmCount): {
+  name: '${resourcePrefix}-pip-${i}-${uniqueSuffix}'
+  location: location
+  tags: tags
+  sku: {
+    name: 'Standard'
+    tier: 'Regional'
+  }
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+    idleTimeoutInMinutes: 4
+    deleteOption: 'Delete'
+  }
+}]
 
 // ===================================
 // Resources - Network Interfaces
@@ -50,6 +75,9 @@ resource networkInterfaces 'Microsoft.Network/networkInterfaces@2024-01-01' = [f
             id: subnetId
           }
           privateIPAllocationMethod: 'Dynamic'
+          publicIPAddress: {
+            id: publicIPs[i].id
+          }
           primary: true
         }
       }
@@ -64,7 +92,7 @@ resource networkInterfaces 'Microsoft.Network/networkInterfaces@2024-01-01' = [f
 // Resources - Session Host VMs
 // ===================================
 
-resource vmResources 'Microsoft.Compute/virtualMachines@2024-03-01' = [for i in range(0, vmCount): {
+resource vmResources 'Microsoft.Compute/virtualMachines@2025-04-01' = [for i in range(0, vmCount): {
   name: '${vmNamePrefix}-${i}-${uniqueSuffix}'
   location: location
   tags: tags
@@ -75,6 +103,13 @@ resource vmResources 'Microsoft.Compute/virtualMachines@2024-03-01' = [for i in 
     hardwareProfile: {
       vmSize: vmSku
     }
+    securityProfile: {
+      securityType: 'TrustedLaunch'
+      uefiSettings: {
+        secureBootEnabled: true
+        vTpmEnabled: true
+      }
+    }
     osProfile: {
       computerName: '${vmNamePrefix}-${i}'
       adminUsername: adminUsername
@@ -83,9 +118,8 @@ resource vmResources 'Microsoft.Compute/virtualMachines@2024-03-01' = [for i in 
         enableAutomaticUpdates: true
         patchSettings: {
           patchMode: 'AutomaticByOS'
-          enableHotpatching: false
         }
-        timeZone: 'UTC'
+        timeZone: 'Europe/London'
       }
       allowExtensionOperations: true
     }
@@ -96,7 +130,7 @@ resource vmResources 'Microsoft.Compute/virtualMachines@2024-03-01' = [for i in 
         caching: 'ReadWrite'
         createOption: 'FromImage'
         managedDisk: {
-          storageAccountType: 'Standard_LRS'
+          storageAccountType: 'StandardSSD_LRS'
         }
       }
     }
@@ -112,34 +146,12 @@ resource vmResources 'Microsoft.Compute/virtualMachines@2024-03-01' = [for i in 
     }
     diagnosticsProfile: {
       bootDiagnostics: {
-        enabled: false
+        enabled: true
       }
     }
   }
 }]
 
-// ===================================
-// Extensions - AVD Agent & Boot Loader Installation
-// ===================================
-
-resource avdExtension 'Microsoft.Compute/virtualMachines/extensions@2025-04-01' = [for i in range(0, vmCount): {
-  parent: vmResources[i]
-  name: 'AVDInstall'
-  location: location
-  tags: tags
-  properties: {
-    publisher: 'Microsoft.Compute'
-    type: 'CustomScriptExtension'
-    typeHandlerVersion: '1.10'
-    autoUpgradeMinorVersion: true
-    protectedSettings: {
-      commandToExecute: avdInstallCommand
-    }
-  }
-  dependsOn: [
-    vmResources
-  ]
-}]
 
 // ===================================
 // Extensions - AAD Join (Entra ID)
@@ -149,46 +161,44 @@ resource aadLoginExtension 'Microsoft.Compute/virtualMachines/extensions@2024-03
   parent: vmResources[i]
   name: 'AADLoginForWindows'
   location: location
-  tags: tags
   properties: {
     publisher: 'Microsoft.Azure.ActiveDirectory'
     type: 'AADLoginForWindows'
-    typeHandlerVersion: '2.0'
+    typeHandlerVersion: '1.0'
     autoUpgradeMinorVersion: true
     enableAutomaticUpgrade: false
   }
-  dependsOn: [
-    vmResources
-  ]
 }]
 
 // ===================================
 // Extensions - Join VM to AVD Host Pool
 // ===================================
+
 resource avdJoinExtension 'Microsoft.Compute/virtualMachines/extensions@2025-04-01' = [for i in range(0, vmCount): {
   parent: vmResources[i]
   name: '${vmNamePrefix}-${i}-AddSessionHost'
   location: location
-  tags: tags
-  dependsOn: [
-    aadLoginExtension[i]
-    avdExtension[i]
-  ]
   properties: {
     publisher: 'Microsoft.Powershell'
     type: 'DSC'
     typeHandlerVersion: '2.73'
-    autoUpgradeMinorVersion: true
     settings: {
       modulesUrl: artifactsLocation
       configurationFunction: 'Configuration.ps1\\AddSessionHost'
       properties: {
         hostPoolName: hostPoolName
-        registrationInfoToken: hostPoolToken
         aadJoin: true
       }
     }
+    protectedSettings: {
+      properties: {
+        registrationInfoToken: hostPoolToken
+      }
+    }
   }
+  dependsOn: [
+    aadLoginExtension[i]
+  ]
 }]
 
 // ===================================
@@ -209,3 +219,9 @@ output vmSku string = vmSku
 
 @description('Number of VMs deployed')
 output vmCount int = vmCount
+
+@description('Public IP Address IDs')
+output publicIPIds array = [for i in range(0, vmCount): publicIPs[i].id]
+
+@description('Public IP Address Names')
+output publicIPNames array = [for i in range(0, vmCount): publicIPs[i].name]

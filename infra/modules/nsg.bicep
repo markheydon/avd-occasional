@@ -1,6 +1,7 @@
 // ===================================
 // Network Security Group Module
-// Minimal rules for AVD reverse connections
+// Simple configuration for personal desktop use
+// Blocks all inbound, allows all outbound
 // ===================================
 
 param nsgName string
@@ -17,34 +18,9 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2024-01-01' = {
   tags: tags
   properties: {
     securityRules: [
-      {
-        name: 'AllowOutboundHttps'
-        properties: {
-          protocol: 'Tcp'
-          sourcePortRange: '*'
-          destinationPortRange: '443'
-          sourceAddressPrefix: '*'
-          destinationAddressPrefix: '*'
-          access: 'Allow'
-          priority: 100
-          direction: 'Outbound'
-          description: 'Allow HTTPS outbound for Azure Virtual Desktop service communication'
-        }
-      }
-      {
-        name: 'AllowOutboundDns'
-        properties: {
-          protocol: 'Udp'
-          sourcePortRange: '*'
-          destinationPortRange: '53'
-          sourceAddressPrefix: '*'
-          destinationAddressPrefix: '*'
-          access: 'Allow'
-          priority: 110
-          direction: 'Outbound'
-          description: 'Allow DNS queries outbound'
-        }
-      }
+      // ===================================
+      // INBOUND RULES
+      // ===================================
       {
         name: 'DenyAllInbound'
         properties: {
@@ -54,9 +30,26 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2024-01-01' = {
           sourceAddressPrefix: '*'
           destinationAddressPrefix: '*'
           access: 'Deny'
-          priority: 1000
+          priority: 4096
           direction: 'Inbound'
-          description: 'Deny all inbound traffic (AVD uses reverse connections)'
+          description: 'Block all inbound - AVD uses reverse connections'
+        }
+      }
+      // ===================================
+      // OUTBOUND RULES
+      // ===================================
+      {
+        name: 'AllowAllOutbound'
+        properties: {
+          protocol: '*'
+          sourcePortRange: '*'
+          destinationPortRange: '*'
+          sourceAddressPrefix: 'VirtualNetwork'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 100
+          direction: 'Outbound'
+          description: 'Allow all outbound for personal desktop internet access'
         }
       }
     ]

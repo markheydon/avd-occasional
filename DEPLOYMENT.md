@@ -35,6 +35,28 @@ The deployment combines AVD Agent and BootLoader installation into a **single `C
 - **How**: Both installation scripts run sequentially within a single extension execution.
 - **Benefit**: Reliable, conflict-free deployment that works correctly on redeployment.
 
+### Explicit Outbound Connectivity (March 2026 Compliance)
+
+Starting March 31, 2026, Azure requires **explicit outbound connectivity methods** for new virtual networks. This template implements compliance by:
+
+- **Standard Public IPs on NICs**: Each session host VM gets a Standard Public IP address for outbound connectivity
+- **Service Endpoints**: Optimized routing to Azure services (Storage, Key Vault, Azure AD) at zero cost
+- **Private Subnets**: Subnets have `defaultOutboundAccess: false` to disable implicit default outbound IPs
+- **Lifecycle Management**: Public IPs are automatically managed by Start/Stop scripts
+
+**Public IP Lifecycle:**
+- **Initial Deployment**: Bicep creates Standard Public IPs and associates them with VM NICs
+- **When Stopping VMs**: `Stop-AvdOccasional.ps1` deallocates VMs, then disassociates and deletes Public IPs to save ~£2-3/month per VM
+- **When Starting VMs**: `Start-AvdOccasional.ps1` creates new Public IPs, associates them with NICs, then starts VMs
+- **IP Address Changes**: Public IPs get new addresses on each start cycle (acceptable for outbound-only connectivity)
+
+**Why This Approach:**
+- ✅ **Cost-optimized**: £0/month when VMs are stopped (vs ~£2-3/month if kept allocated)
+- ✅ **Compliant**: Meets Azure's explicit outbound requirement
+- ✅ **Secure**: NSG blocks ALL inbound traffic - IPs are outbound-only
+- ✅ **Automated**: Scripts handle the entire lifecycle
+- ✅ **Functional**: Provides full internet access for Windows Updates, DSC downloads, browsing
+
 ## Step-by-Step Deployment
 
 ### 1. Clone & Setup
@@ -157,8 +179,8 @@ $appGroupId = (az resource list --resource-group avd-occasional-rg `
   --resource-type "Microsoft.DesktopVirtualization/applicationGroups" `
   --query '[0].id' -o tsv)
 
-# Get user ID
-$userId = (az ad user show --id "user@example.com" --query id -o tsv)
+# Get user ID of the current user
+$userId = (az ad signed-in-user show --query id -o tsv)
 
 # Assign role
 az role assignment create `

@@ -61,7 +61,7 @@ var vmSku = vmSkuMap[workloadSize]
 var vmImageReference = {
   publisher: 'MicrosoftWindowsDesktop'
   offer: 'Windows-11'
-  sku: 'win11-23h2-ent'
+  sku: 'win11-25h2-ent'
   version: 'latest'
 }
 
@@ -72,7 +72,6 @@ var workspaceName = '${resourcePrefix}-ws-${uniqueSuffix}'
 var appGroupName = '${resourcePrefix}-dag-${uniqueSuffix}'
 var nsgName = '${resourcePrefix}-nsg-${uniqueSuffix}'
 
-// Generate host pool registration token (valid for 24 hours)
 var hostPoolToken = avdPoolModule.outputs.registrationToken
 
 // ===================================
@@ -110,6 +109,7 @@ module avdPoolModule 'modules/avd-pool.bicep' = {
     appGroupName: appGroupName
     location: location
     tags: tags
+    validationEnvironment: environment != 'prod'
   }
   dependsOn: [
     networkModule
@@ -164,11 +164,14 @@ output sessionHostIds array = sessionHostModule.outputs.vmIds
 @description('Session Host Names')
 output sessionHostNames array = sessionHostModule.outputs.vmNames
 
+@description('Public IP Names')
+output publicIPNames array = sessionHostModule.outputs.publicIPNames
+
 @description('VM SKU used')
 output vmSkuUsed string = vmSku
 
 @description('Total estimated monthly cost (VM deallocated)')
-output estimatedMonthlyCostIdle string = vmSku == 'Standard_B2s' ? '~£10-12' : '~£10-15'
+output estimatedMonthlyCostIdle string = vmSku == 'Standard_B2s' ? '~£2-3' : '~£2-3'
 
 @description('Total estimated monthly cost (VM running)')
-output estimatedMonthlyCostActive string = vmSku == 'Standard_B2s' ? '~£35-40' : '~£90-120'
+output estimatedMonthlyCostActive string = vmSku == 'Standard_B2s' ? '~£37-43' : '~£92-123'

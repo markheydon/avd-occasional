@@ -27,6 +27,51 @@ Write-Host "Found $($vms.Count) VM(s) to start:" -ForegroundColor Yellow
 $vms | ForEach-Object { Write-Host "  - $_" }
 Write-Host ""
 
+Write-Host "Allocating Public IPs for outbound connectivity..." -ForegroundColor Cyan
+
+foreach ($vm in $vms) {
+    # Get the NIC associated with the VM
+    $nicId = az vm show --resource-group $ResourceGroupName --name $vm --query "networkProfile.networkInterfaces[0].id" -o tsv 2>$null
+    
+    if ($nicId) {
+        $nicName = ($nicId -split '/')[-1]
+        
+        # Check if Public IP already exists
+        $existingPipId = az network nic show --ids $nicId --query "ipConfigurations[0].publicIpAddress.id" -o tsv 2>$null
+        
+        if (-not $existingPipId) {
+            # Create Public IP with naming convention matching Bicep template
+            $pipName = "$nicName-pip"
+            Write-Host "  Creating Public IP for $vm..." -ForegroundColor Yellow
+            
+            $pipId = az network public-ip create `
+                --resource-group $ResourceGroupName `
+                --name $pipName `
+                --sku Standard `
+                --allocation-method Static `
+                --version IPv4 `
+                --query "publicIp.id" -o tsv 2>$null
+            
+            if ($pipId) {
+                # Associate Public IP to NIC
+                Write-Host "  Associating Public IP to $vm..." -ForegroundColor Yellow
+                az network nic ip-config update `
+                    --resource-group $ResourceGroupName `
+                    --nic-name $nicName `
+                    --name ipconfig1 `
+                    --public-ip-address $pipId 2>$null | Out-Null
+            }
+        }
+        else {
+            Write-Host "  Public IP already exists for $vm" -ForegroundColor Gray
+        }
+    }
+}
+
+Write-Host ""
+Write-Host "Public IPs allocated." -ForegroundColor Green
+Write-Host ""
+
 # Start each VM
 foreach ($vm in $vms) {
     Write-Host "Starting $vm..." -ForegroundColor Yellow

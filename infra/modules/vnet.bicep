@@ -39,7 +39,22 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-01-01' = {
         name: subnetName
         properties: {
           addressPrefix: subnetAddressPrefix
-          privateEndpointNetworkPolicies: 'Enabled'
+          defaultOutboundAccess: false
+          serviceEndpoints: [
+            {
+              service: 'Microsoft.Storage'
+              locations: [location]
+            }
+            {
+              service: 'Microsoft.KeyVault'
+              locations: [location]
+            }
+            {
+              service: 'Microsoft.AzureActiveDirectory'
+              locations: ['*']
+            }
+          ]
+          privateEndpointNetworkPolicies: 'Disabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
         }
       }

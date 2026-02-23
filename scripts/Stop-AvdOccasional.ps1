@@ -34,8 +34,47 @@ foreach ($vm in $vms) {
 
 Write-Host "VM stop operations started. This may take a few minutes..." -ForegroundColor Green
 Write-Host ""
+
+Write-Host "Deallocating Public IPs to save costs..." -ForegroundColor Cyan
+Write-Host "Note: This will save ~£2-3/month per VM while stopped." -ForegroundColor Gray
+Write-Host ""
+
+foreach ($vm in $vms) {
+    # Get the NIC associated with the VM
+    $nicId = az vm show --resource-group $ResourceGroupName --name $vm --query "networkProfile.networkInterfaces[0].id" -o tsv 2>$null
+    
+    if ($nicId) {
+        $nicName = ($nicId -split '/')[-1]
+        
+        # Get the Public IP associated with the NIC
+        $pipId = az network nic show --ids $nicId --query "ipConfigurations[0].publicIpAddress.id" -o tsv 2>$null
+        
+        if ($pipId) {
+            $pipName = ($pipId -split '/')[-1]
+            Write-Host "  Removing Public IP from $vm..." -ForegroundColor Yellow
+            
+            # Disassociate Public IP from NIC
+            az network nic ip-config update `
+                --resource-group $ResourceGroupName `
+                --nic-name $nicName `
+                --name ipconfig1 `
+                --remove publicIpAddress 2>$null | Out-Null
+            
+            # Delete the Public IP to stop billing
+            Write-Host "  Deleting Public IP $pipName..." -ForegroundColor Yellow
+            az network public-ip delete `
+                --resource-group $ResourceGroupName `
+                --name $pipName `
+                --no-wait 2>$null
+        }
+        else {
+            Write-Host "  No Public IP found for $vm" -ForegroundColor Gray
+        }
+    }
+}
+
+Write-Host ""
+Write-Host "Public IPs deallocated successfully." -ForegroundColor Green
+Write-Host ""
 Write-Host "To check status:" -ForegroundColor Cyan
 Write-Host "  az vm list --resource-group $ResourceGroupName --query '[].{Name:name, PowerState:powerState}' -o table"
-Write-Host ""
-Write-Host "To restart VMs:" -ForegroundColor Cyan
-Write-Host "  .\scripts\Start-AvdOccasional.ps1 -ResourceGroupName $ResourceGroupName"

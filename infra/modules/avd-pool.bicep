@@ -8,9 +8,11 @@ param workspaceName string
 param appGroupName string
 param location string
 param tags object
+@description('Enable validation environment for preview features')
+param validationEnvironment bool = false
 
-@description('Token expiration time (default: 27 days from deployment)')
-param tokenExpirationTime string = dateTimeAdd(utcNow('u'), 'P27D')
+@description('Token expiration time (default: 30 days from deployment)')
+param tokenExpirationTime string = dateTimeAdd(utcNow('u'), 'P30D')
 
 // ===================================
 // Resources - Host Pool
@@ -21,13 +23,14 @@ resource hostPool 'Microsoft.DesktopVirtualization/hostPools@2024-04-03' = {
   location: location
   tags: tags
   properties: {
+    validationEnvironment: validationEnvironment
     hostPoolType: 'Personal'
     personalDesktopAssignmentType: 'Automatic'
     preferredAppGroupType: 'Desktop'
     maxSessionLimit: 1
     loadBalancerType: 'Persistent'
     startVMOnConnect: false
-    customRdpProperty: 'targetisaadjoined:i:1;drivestoredirect:s:*;audiomode:i:0;videoplaybackmode:i:1;redirectclipboard:i:1;redirectprinters:i:1;devicestoredirect:s:*;redirectcomports:i:1;redirectsmartcards:i:1;usbdevicestoredirect:s:*;enablecredsspsupport:i:1;redirectwebauthn:i:1;use multimon:i:1;'
+    customRdpProperty: 'targetisaadjoined:i:1;audiomode:i:0;videoplaybackmode:i:1;redirectclipboard:i:1;enablecredsspsupport:i:1;redirectwebauthn:i:1;use multimon:i:1;'
     registrationInfo: {
       expirationTime: tokenExpirationTime
       registrationTokenOperation: 'Update'

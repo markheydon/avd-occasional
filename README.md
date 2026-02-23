@@ -10,11 +10,11 @@ Cost-effective Azure Virtual Desktop setup using Bicep Infrastructure as Code. D
 
 ## Overview
 
-This project provides a reproducible, parameterized approach to deploying Azure Virtual Desktop personal desktops for occasional, remote work scenarios. Focus is on **cost optimization** by deallocating (not deleting) VMs when not in use, reducing monthly costs from ~£100-150 to just £10-15.
+This project provides a reproducible, parameterized approach to deploying Azure Virtual Desktop personal desktops for occasional, remote work scenarios. Focus is on **cost optimization** by deallocating (not deleting) VMs when not in use, reducing monthly costs from ~£92-125 to just £2-3.
 
 **Typical cost profile:**
-- **Idle (deallocated)**: ~£10-15/month (storage only).
-- **Active (running)**: ~£100-150/month (compute + storage).
+- **Idle (deallocated)**: ~£2-3/month (storage only).
+- **Active (running)**: ~£92-125/month (compute + storage + public IP).
 - **Completely deleted**: £0 (requires 10-15 min redeploy).
 
 ## Quick Start
@@ -39,10 +39,10 @@ az account set --subscription <subscription-id>
 ### 2. Review Parameters
 
 Edit `infra/parameters.json` to customize:
-- `environment`: "dev" (for testing)
-- `workloadSize`: "moderate" (or "light" for lighter workload)
-- `location`: "ukwest" (or your preferred region)
-- `vmCount`: 1 (number of session hosts)
+- `environment`: "dev" (for testing).
+- `workloadSize`: "moderate" (or "light" for lighter workload).
+- `location`: "ukwest" (or your preferred region).
+- `vmCount`: 1 (number of session hosts).
 
 ### 3. Prepare Admin Credentials
 
@@ -117,8 +117,8 @@ Requires additional setup for RDP Shortpath (not recommended for occasional use)
 
 For Entra ID-joined AVD deployments, users need **two roles**:
 
-1. **Desktop Virtualization User** - Grants access to the AVD workspace and application group
-2. **Virtual Machine User Login** - Allows login to the Entra ID-joined session host VMs
+1. **Desktop Virtualization User** - Grants access to the AVD workspace and application group.
+2. **Virtual Machine User Login** - Allows login to the Entra ID-joined session host VMs.
 
 ### 1. Assign Desktop Virtualization User Role
 
@@ -137,9 +137,15 @@ This role allows users to see and access the AVD workspace:
 **Via Azure CLI:**
 
 ```powershell
-$appGroupId = (az resource list --resource-group avd-occasional-rg --resource-type "Microsoft.DesktopVirtualization/applicationGroups" --query '[0].id' -o tsv)
-$userId = (az ad user show --id "user@example.com" --query id -o tsv)
+# Get Application Group ID
+$appGroupId = (az resource list --resource-group avd-occasional-rg `
+  --resource-type "Microsoft.DesktopVirtualization/applicationGroups" `
+  --query '[0].id' -o tsv)
 
+# Get user ID of the current user
+$userId = (az ad signed-in-user show --query id -o tsv)
+
+# Assign role
 az role assignment create `
   --role "Desktop Virtualization User" `
   --assignee $userId `
@@ -158,7 +164,7 @@ This role allows users to actually log into the Entra ID-joined VM after connect
 **In Azure Portal:**
 
 1. Navigate to Resource Groups > `avd-occasional-rg`.
-2. Find the **Virtual Machine**: `avd-dev-vm-0-*`.
+2. Find the **Virtual Machine(s)**: `avd-dev-vm-0-*`.
 3. Open the VM and go to **Access control (IAM)**.
 4. Click **+ Add > Add role assignment**.
 5. Select **Virtual Machine User Login** role (or **Virtual Machine Administrator Login** for admin access).
@@ -171,28 +177,39 @@ This role allows users to actually log into the Entra ID-joined VM after connect
 # Get your user ID
 $userId = (az ad signed-in-user show --query id -o tsv)
 
-# Get the VM resource ID
-$vmId = (az vm show --resource-group avd-occasional-rg --name avd-dev-vm-0-* --query id -o tsv)
+# Get all VM resource IDs in the resource group (handles multiple VMs)
+$vmIds = @(az vm list --resource-group avd-occasional-rg --query '[].id' -o tsv)
 
-# Assign Virtual Machine User Login role
-az role assignment create `
-  --role "Virtual Machine User Login" `
-  --assignee $userId `
-  --scope $vmId
+# Assign Virtual Machine User Login role to all VMs
+foreach ($vmId in $vmIds) {
+    az role assignment create `
+      --role "Virtual Machine User Login" `
+      --assignee $userId `
+      --scope $vmId
+}
 ```
 
 **For administrator access instead:**
 ```powershell
-az role assignment create `
-  --role "Virtual Machine Administrator Login" `
-  --assignee $userId `
-  --scope $vmId
+# Get your user ID
+$userId = (az ad signed-in-user show --query id -o tsv)
+
+# Get all VM resource IDs in the resource group
+$vmIds = @(az vm list --resource-group avd-occasional-rg --query '[].id' -o tsv)
+
+# Assign Virtual Machine Administrator Login role to all VMs
+foreach ($vmId in $vmIds) {
+    az role assignment create `
+      --role "Virtual Machine Administrator Login" `
+      --assignee $userId `
+      --scope $vmId
+}
 ```
 
 **Without this role assignment:**
-- Users will see: "Your account is configured to prevent you from using this device"
-- Login will fail even after successfully connecting to AVD
-- This is required for all Entra ID-joined VMs
+- Users will see: "Your account is configured to prevent you from using this device".
+- Login will fail even after successfully connecting to AVD.
+- This is required for all Entra ID-joined VMs.
 
 **Summary:** Allow 5-10 minutes after both role assignments for propagation before attempting to connect.
 
@@ -258,8 +275,8 @@ az deployment group create `
 Parameters flow through multiple layers with clear precedence:
 
 1. **Bicep defaults** (lowest priority): Default values in `param` declarations
-2. **JSON file** (medium priority): `parameters.json` provides environment baseline
-3. **CLI overrides** (highest priority): Command-line `--parameters key=value` flags override both
+2. **JSON file** (medium priority): `parameters.json` provides environment baseline.
+3. **CLI overrides** (highest priority): Command-line `--parameters key=value` flags override both.
 
 Example:
 ```powershell
@@ -269,24 +286,24 @@ Example:
 ```
 
 This layering allows:
-- **Reusable baselines** for different environments (parameters.dev.json, parameters.prod.json)
-- **Safe parameter injection** without modifying files
-- **Flexible orchestration** from scripts or CI/CD pipelines
+- **Reusable baselines** for different environments (parameters.dev.json, parameters.prod.json).
+- **Safe parameter injection** without modifying files.
+- **Flexible orchestration** from scripts or CI/CD pipelines.
 
 ### Separation of Concerns
 
 The architecture intentionally separates:
-- **Bicep files** = Infrastructure logic and definitions
-- **parameters.json** = Configuration defaults (version-controlled)
-- **PowerShell scripts** = Orchestration and automation
+- **Bicep files** = Infrastructure logic and definitions.
+- **parameters.json** = Configuration defaults (version-controlled).
+- **PowerShell scripts** = Orchestration and automation.
 
 ### Security: Why adminPassword Isn't in parameters.json
 
 The `adminPassword` parameter is **intentionally excluded** from `parameters.json`:
-- ✅ Never stored in Git
-- ✅ Prompted interactively during deployment
-- ✅ Passed securely via CLI at runtime
-- ✅ Marked `@secure()` in Bicep to prevent logging
+- ✅ Never stored in Git.
+- ✅ Prompted interactively during deployment.
+- ✅ Passed securely via CLI at runtime.
+- ✅ Marked `@secure()` in Bicep to prevent logging.
 
 This follows infrastructure-as-code security best practices: **secrets are never committed to version control**.
 
@@ -302,20 +319,20 @@ This follows infrastructure-as-code security best practices: **secrets are never
    ```
    Wait ~2-3 minutes for startup.
 
-2. **Connect via Windows App**:
-   - Launch Windows App
-   - Select workspace
-   - Launch "Personal Desktop"
+2. **Connect via Windows App**.
+   - Launch Windows App.
+   - Select workspace.
+   - Launch "Personal Desktop".
 
-3. **Work** - Use your desktop as normal
+3. **Work** - Use your desktop as normal.
 
 ### Saving Costs
 
-3. **When done working, stop VMs**:
+3. **When done working, stop VMs**.
    ```powershell
    .\scripts\Stop-AvdOccasional.ps1
    ```
-   This saves ~90% on compute costs while keeping everything ready for next use.
+   This saves ~98% on compute costs while keeping everything ready for next use.
 
 ### If You Need to Scale Workload
 
@@ -334,8 +351,8 @@ Then redeploy:
 ```
 
 **SKU Mappings:**
-- `light`: Standard_B2s (2 vCPU, 4GB RAM) - ~£35/mo
-- `moderate`: Standard_D2s_v3 (2 vCPU, 8GB RAM) - ~£100/mo
+- `light`: Standard_B2s (2 vCPU, 4GB RAM) - ~£35/mo.
+- `moderate`: Standard_D2s_v3 (2 vCPU, 8GB RAM) - ~£100/mo.
 
 ---
 
@@ -394,27 +411,39 @@ az group delete --name avd-occasional-rg --yes
 
 ## Cost Analysis
 
-_**⚠️ IMPORTANT NOTE**: The following cost analysis is based on UK pricing around Februrary 2026 and should be used an an example only. You should the official [Pricing Calculator](https://azure.microsoft.com/en-us/pricing/calculator/) for accurate estimates of what your costs might if you deploy this to your Azure environment._
+_**⚠️ IMPORTANT NOTE**: The following cost analysis is based on UK pricing around February 2026 and should be used as an example only. Use the official [Pricing Calculator](https://azure.microsoft.com/en-us/pricing/calculator/) for accurate estimates of your deployment costs._
 
 ### Component Cost Breakdown (Monthly)
 
 | Component | Deallocated | Active | Notes |
 |-----------|-----------|--------|-------|
 | **D2s_v3 VM (moderate)** | £0 | £90-120 | Largest cost driver |
-| **OS Disk (Standard HDD)** | £2-3 | £2-3 | Always charged |
-| **Network interfaces** | <£1 | <£1 | Minimal |
-| **VNet/Subnet** | £0 | £0 | Free |
+| **OS Disk (Standard SSD)** | £2-3 | £2-3 | Always charged, fast performance |
+| **Standard Public IP** | £0 | £2-3 | Deleted when stopped (lifecycle managed) |
+| **Network (VNet/NSG)** | £0 | £0 | Free |
 | **Host Pool/Workspace** | £0 | £0 | Free (AVD service) |
 | **App Group** | £0 | £0 | Free (management layer) |
-| **TOTAL** | **£10-15** | **£100-130** | Deallocate = 90% savings |
+| **TOTAL** | **£2-3** | **£94-126** | Deallocate = 98% savings |
+
+**Public IP Lifecycle Management**: The Start/Stop scripts automatically manage Public IP lifecycle:
+- **When stopped**: Public IPs are deleted to eliminate ~£2-3/month cost.
+- **When started**: New Public IPs are created automatically.
+- **IP addresses change** on each restart (acceptable for outbound-only connectivity).
+- **Security**: NSG blocks ALL inbound traffic - IPs are for outbound internet only.
+
+**VM Security & Performance Features**:
+- **Trusted Launch**: Secure boot and vTPM enabled for enhanced security.
+- **Standard SSD OS Disk**: Fast boot times and application performance (same cost as HDD).
+- **Boot Diagnostics**: Enabled for troubleshooting (uses managed storage, no extra cost).
+- **Automatic Windows Updates**: Managed by the platform to keep hosts patched.
 
 ### Cost Optimization Strategies
 
-1. **Default: Deallocate after use** (Recommended)
-   - Fast recovery (~3 min)
-   - Minimal cost (~£12/mo)
-   - Preserves desktop configuration
-   - Best for: Daily/weekly occasional use
+1. **Default: Deallocate after use** (Recommended).
+   - Fast recovery (~3 min).
+   - Minimal cost (~£2-3/mo).
+   - Preserves desktop configuration.
+   - Best for: Daily/weekly occasional use.
 
 2. **Alternative: Delete and redeploy** (For very infrequent use)
    - True zero cost between uses
@@ -438,18 +467,28 @@ _**⚠️ IMPORTANT NOTE**: The following cost analysis is based on UK pricing a
 │  Azure Virtual Network (10.0.0.0/16)    │
 ├─────────────────────────────────────────┤
 │  AVD Hosts Subnet (10.0.1.0/24)         │
+│  (defaultOutboundAccess: false)         │
+│  Service Endpoints (FREE):              │
+│  • Microsoft.Storageoptimized routing): │
+│  • Microsoft.Storage                    │
+│  • Microsoft.KeyVault                   │
+│  • Microsoft.AzureActiveDirectory       │
 │  ┌──────────────────────────────┐       │
 │  │ Session Host VM              │       │
-│  │ (No Public IP)               │       │
+│  │ ├─ Public IP (when running)  │       │
 │  │ ├─ Network Interface (NIC)   │       │
 │  │ ├─ OS Disk (30GB)            │       │
 │  │ └─ System Managed Identity   │       │
 │  └──────────────────────────────┘       │
 │  NSG Rules:                             │
-│  • Allow HTTPS outbound (443)           │
-│  • Allow DNS outbound (53)              │
-│  • Deny all inbound                     │
-└─────────────────────────────────────────┘
+│  • Allow ALL outbound to Internet       │
+│  • Allow Azure service tags outbound    │
+│  • Deny ALL inbound from Internet       │
+│                                         │
+│  Outbound Connectivity:                 │
+│  • Standard Public IP on NIC (explicit) │
+│  • Deleted when VM stopped (cost opt.)  │
+│  • Recreated when VM started         ───┘
          ↓ Reverse connection
 ┌──────────────────────────────────────────┐
 │  Azure Virtual Desktop Service           │
@@ -465,14 +504,15 @@ _**⚠️ IMPORTANT NOTE**: The following cost analysis is based on UK pricing a
 ```
 Resource Group (avd-occasional-rg)
 ├── Virtual Network
-│   └── Subnet (avd-hosts)
+│   └── Subnet (avd-hosts with Service Endpoints)
 ├── Network Security Group
 ├── Host Pool (Personal, Direct assignment)
 ├── Workspace
 ├── Application Group (Desktop, linked to Workspace)
 └── Session Host VMs (1-5)
-    ├── Network Interfaces
+    ├── Network Interfaces (private IPs only)
     └── OS Disks
+    ├── Public IP Addresses (lifecycle managed
 ```
 
 ---
@@ -622,5 +662,3 @@ This Bicep template is provided as-is for personal use. Azure services are subje
 ---
 
 **Last Updated**: February 2026  
-**Template Version**: 1.0  
-**AVD API Version**: 2024-04-01
