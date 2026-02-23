@@ -11,12 +11,12 @@ Get your Azure Virtual Desktop environment running in approximately 5 minutes.
 
 Before starting, ensure you have:
 
-- ✅ Azure CLI v2.40+ installed
-- ✅ Bicep CLI (included with Azure CLI v2.20+)
-- ✅ PowerShell 5.1+
-- ✅ Azure subscription with Contributor role
-- ✅ Entra ID user account
-- ✅ Strong admin password for session hosts
+- ✅ Azure CLI v2.40+ installed.
+- ✅ Bicep CLI (included with Azure CLI v2.20+).
+- ✅ PowerShell 5.1+.
+- ✅ Azure subscription with Contributor role.
+- ✅ Entra ID user account.
+- ✅ Strong admin password for session hosts.
 
 For detailed prerequisites, see [Prerequisites Guide](prerequisites.md).
 

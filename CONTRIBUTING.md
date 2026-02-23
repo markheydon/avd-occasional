@@ -51,42 +51,42 @@ az resource list --resource-group avd-occasional-rg -o table
 ## Code Style
 
 - **Bicep files**: Follow [.github/copilot-instructions.md](.github/copilot-instructions.md)
-  - Use `camelCase` for parameters and variables
-  - Use `PascalCase` for resource names
-  - Add `@description()` decorators to all parameters and outputs
-  - Use comments for non-obvious logic
-  - Keep modules focused (one responsibility)
+  - Use `camelCase` for parameters and variables.
+  - Use `PascalCase` for resource names.
+  - Add `@description()` decorators to all parameters and outputs.
+  - Use comments for non-obvious logic.
+  - Keep modules focused (one responsibility).
 
 - **PowerShell scripts**: Follow [.github/copilot-instructions.md](.github/copilot-instructions.md)
-  - Use Verb-AvdOccasional naming pattern for scripts
-  - Use approved PowerShell verbs (Deploy, Start, Stop, Remove)
-  - Use `PascalCase` for parameter names
-  - Include inline comments explaining purpose and non-obvious logic
+  - Use Verb-AvdOccasional naming pattern for scripts.
+  - Use approved PowerShell verbs (Deploy, Start, Stop, Remove).
+  - Use `PascalCase` for parameter names.
+  - Include inline comments explaining purpose and non-obvious logic.
 
-- **Markdown documentation**: Use UK English conventions
-  - Spelling: "organisation", "customise", "colour"
-  - Terminology: Consistent terminology throughout (e.g., "Entra ID" not "Azure AD")
-  - Links: Relative links between docs/ files; full URLs for external resources
+- **Markdown documentation**: Use UK English conventions.
+  - Spelling: "organisation", "customise", "colour".
+  - Terminology: Consistent terminology throughout (e.g., "Entra ID" not "Azure AD").
+  - Links: Relative links between docs/ files; full URLs for external resources.
 
 ## Adding New Features
 
 If adding new functionality:
 
-1. Update relevant Bicep modules in `infra/`
-2. Update `infra/parameters.json` defaults if adding new parameters
-3. Update documentation in `docs/` and `README.md` if user-facing
-4. Test with multiple parameter configurations
-5. Update `CHANGELOG.md` with your changes
+1. Update relevant Bicep modules in `infra/`.
+2. Update `infra/parameters.json` defaults if adding new parameters.
+3. Update documentation in `docs/` and `README.md` if user-facing.
+4. Test with multiple parameter configurations.
+5. Update `CHANGELOG.md` with your changes.
 
 ## Submitting Documentation Changes
 
 Documentation improvements are valuable! When updating docs:
 
-1. Use UK English spelling throughout
-2. Ensure links between docs work correctly
-3. Keep explanations clear and concise
-4. Test that markdown renders correctly on GitHub
-5. Verify all code examples are copy-paste friendly
+1. Use UK English spelling throughout.
+2. Ensure links between docs work correctly.
+3. Keep explanations clear and concise.
+4. Test that markdown renders correctly on GitHub.
+5. Verify all code examples are copy-paste friendly.
 
 See [docs/](docs/) for documentation structure.
 

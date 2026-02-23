@@ -4,9 +4,11 @@ on:
   push:
     paths:
       - "infra/**"
+      - "bicepconfig.json"
   pull_request:
     paths:
       - "infra/**"
+      - "bicepconfig.json"
 
 jobs:
   lint-build:

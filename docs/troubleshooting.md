@@ -14,9 +14,9 @@ Solutions for common issues encountered during deployment and operation.
 **Symptoms:** Deployment fails with quota-related error message.
 
 **Causes:** 
-- Chosen region has resource quotas reached
-- Subscription-level limits hit (e.g., maximum VMs)
-- Resource provider not registered
+- Chosen region has resource quotas reached.
+- Subscription-level limits hit (e.g., maximum VMs).
+- Resource provider not registered.
 
 **Solutions:**
 
@@ -52,10 +52,10 @@ az provider register --namespace Microsoft.DesktopVirtualization
 **Symptoms:** Deployment fails at validation stage with cryptic error message.
 
 **Causes:**
-- Malformed parameters.json
-- Bicep syntax error
-- Missing or invalid parameter value
-- Region doesn't support required resources
+- Malformed parameters.json.
+- Bicep syntax error.
+- Missing or invalid parameter value.
+- Region doesn't support required resources.
 
 **Solutions:**
 
@@ -89,9 +89,9 @@ az provider list --query "[?registrationState=='Registered'].namespace" -o tsv
 **Symptoms:** Deployment fails with "Insufficient permissions" or "Unauthorized" error.
 
 **Causes:**
-- Azure account doesn't have Contributor role on subscription
-- Service Principal lacks required permissions
-- Insufficient permission for role assignments
+- Azure account doesn't have Contributor role on subscription.
+- Service Principal lacks required permissions.
+- Insufficient permission for role assignments.
 
 **Solutions:**
 
@@ -118,9 +118,9 @@ az role assignment list --assignee <service-principal-id>
 **Symptoms:** Bicep build or deployment fails with syntax error.
 
 **Causes:**
-- Bicep code has typos or invalid constructs
-- Parameter file malformed JSON
-- PowerShell script has syntax errors
+- Bicep code has typos or invalid constructs.
+- Parameter file malformed JSON.
+- PowerShell script has syntax errors.
 
 **Solutions:**
 
@@ -144,6 +144,26 @@ Get-ChildItem -Recurse -Filter "*.bicep" | ForEach-Object {
    - Ensure all braces and brackets are balanced
    - Verify string values are quoted with double quotes
 
+## Diagnosis with Test-AvdSessionHost
+
+The `Test-AvdSessionHost.ps1` script provides automated diagnostics for session host issues. Run it first when troubleshooting connectivity problems:
+
+```powershell
+# Auto-discover and diagnose
+.\scripts\Test-AvdSessionHost.ps1
+```
+
+The script checks:
+- VM power state (running/deallocated).
+- VM extensions (AADLoginForWindows, DSC).
+- Session host status in AVD host pool (Available/Unavailable).
+- Entra ID RDP properties (authentication configuration).
+- AVD agent heartbeat (last reported time).
+
+Review the **Recommendations** section in script output for next steps. Then consult the relevant troubleshooting section below for detailed solutions.
+
+---
+
 ## Connection Issues
 
 ### Error: "Workspace not available in Windows App"
@@ -151,14 +171,20 @@ Get-ChildItem -Recurse -Filter "*.bicep" | ForEach-Object {
 **Symptoms:** User signs into Windows App but sees no workspaces available.
 
 **Causes:**
-- Desktop Virtualization User role not assigned
-- Role assignment not yet propagated
-- User not assigned to correct Application Group
-- Workspace not configured correctly
+- Desktop Virtualization User role not assigned.
+- Role assignment not yet propagated.
+- User not assigned to correct Application Group.
+- Workspace not configured correctly.
 
 **Solutions:**
 
-1. Verify role assignment exists:
+1. Run diagnostics first:
+   ```powershell
+   .\scripts\Test-AvdSessionHost.ps1
+   ```
+   If session host status is "Available", role assignment may be the issue. Otherwise, see the script output for other problems.
+
+2. Verify role assignment exists:
 ```powershell
 $appGroupId = (az resource list --resource-group avd-occasional-rg `
   --resource-type "Microsoft.DesktopVirtualization/applicationGroups" `
@@ -192,13 +218,25 @@ az desktopvirtualization applicationgroup list `
 **Symptoms:** User successfully connects to Windows App and sees workspace, but gets error when launching desktop.
 
 **Causes:**
-- Virtual Machine User Login role not assigned to user
-- Role not yet propagated
-- Session host VM is stopped or not running
+- Virtual Machine User Login role not assigned to user.
+- Role not yet propagated.
+- Session host VM is stopped or not running.
 
 **Solutions:**
 
-1. Verify Virtual Machine User Login role is assigned:
+1. Run diagnostics first:
+   ```powershell
+   .\scripts\Test-AvdSessionHost.ps1
+   ```
+   If session host status is "Available", review the output:
+   - If Power State is "VM deallocated", start VMs with `.\scripts\Start-AvdOccasional.ps1`
+   - If extensions show errors, redeploy with `.\scripts\Deploy-AvdOccasional.ps1`
+   - If Entra ID auth is missing, check RDP properties and redeploy
+   - If heartbeat is old, restart the VM
+   
+   If session host is not Available, continue below.
+
+2. Verify Virtual Machine User Login role is assigned:
 ```powershell
 $userId = (az ad signed-in-user show --query id -o tsv)
 $vmIds = @(az vm list --resource-group avd-occasional-rg --query '[].id' -o tsv)
@@ -288,15 +326,27 @@ NSG should allow outbound traffic. If all rules are "Deny", access is blocked.
 
 **Symptoms:** Deployment appears to complete, but VMs don't show in resource list or remain stuck in Provisioning state.
 
+**Quick Check:** Run diagnostics:
+```powershell
+.\scripts\Test-AvdSessionHost.ps1
+```
+Review output for extension status and session host registration status.
+
 **Causes:**
-- Deployment still in progress (check actual status)
-- Deployment failed silently
-- Resource group query filtered wrong type
-- VM extension failed
+- Deployment still in progress (check actual status).
+- Deployment failed silently.
+- Resource group query filtered wrong type.
+- VM extension failed.
 
 **Solutions:**
 
-1. Check actual deployment status:
+1. Check VM and extension status via diagnostics:
+   ```powershell
+   .\scripts\Test-AvdSessionHost.ps1
+   ```
+   If extensions show failed status, see recommendations in the output.
+
+2. Check actual deployment status:
 ```powershell
 # Get latest deployment
 $deployment = (az deployment group list --resource-group avd-occasional-rg `
@@ -312,7 +362,7 @@ if ($deployment.properties.provisioningState -ne 'Succeeded') {
 }
 ```
 
-2. Check VM extension status (Custom Script installation):
+3. Check VM extension status (Custom Script installation):
 ```powershell
 $vmExtensions = @(az vm extension list --resource-group avd-occasional-rg `
   --vm-name (az vm list --resource-group avd-occasional-rg --query '[0].name' -o tsv) `
@@ -326,7 +376,7 @@ If extension failed, re-run:
 .\scripts\Deploy-AvdOccasional.ps1 -WhatIf
 ```
 
-3. Rerun deployment (idempotent safe):
+4. Rerun deployment (idempotent safe):
 ```powershell
 .\scripts\Deploy-AvdOccasional.ps1
 ```
@@ -428,9 +478,9 @@ Set-ExecutionPolicy -ExecutionPolicy Restricted -Scope CurrentUser
 Get-Help .\scripts\Deploy-AvdOccasional.ps1 -Parameter *
 ```
 
-2. Verify parameter spelling (case-sensitive):
-   - Correct: `-AdminPassword`
-   - Incorrect: `-adminPassword` (lowercase)
+2. Verify that you're using a valid parameter name and spelling, matching what `Get-Help` shows:
+   - Example parameter: `-AdminPassword`
+   - PowerShell parameter names are case-insensitive, so `-AdminPassword` and `-adminPassword` are treated the same.
 
 3. Re-clone repository in case script is outdated:
 ```powershell

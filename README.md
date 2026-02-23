@@ -101,13 +101,13 @@ az vm list-ip-addresses --resource-group avd-occasional-rg
 
 ## Key Features
 
-- ✅ **Bicep Infrastructure as Code** – Reproducible, auditable, version-controlled
-- ✅ **Cost optimised** – 98% savings when deallocated
-- ✅ **Entra ID-joined VMs** – Cloud-native, no on-premises AD required
-- ✅ **Fully idempotent** – Safe to redeploy multiple times
-- ✅ **Automated lifecycle scripts** – Deploy, start, stop, remove
-- ✅ **Zero inbound access** – Reverse connections only, NSG included
-- ✅ **March 2026 compliant** – Explicit outbound connectivity via Standard Public IPs
+- ✅ **Bicep Infrastructure as Code** – Reproducible, auditable, version-controlled.
+- ✅ **Cost optimised** – 98% savings when deallocated.
+- ✅ **Entra ID-joined VMs** – Cloud-native, no on-premises AD required.
+- ✅ **Fully idempotent** – Safe to redeploy multiple times.
+- ✅ **Automated lifecycle scripts** – Deploy, start, stop, remove.
+- ✅ **Zero inbound access** – Reverse connections only, NSG included.
+- ✅ **March 2026 compliant** – Explicit outbound connectivity via Standard Public IPs.
 
 ## For Contributors
 

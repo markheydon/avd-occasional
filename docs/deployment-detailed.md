@@ -15,12 +15,12 @@ This guide provides comprehensive deployment instructions, architectural context
 
 ### Prerequisites Checklist
 
-- [ ] Azure CLI v2.40+ installed
-- [ ] Bicep CLI v0.20+ (included with Azure CLI v2.20+)
-- [ ] PowerShell 5.1+
-- [ ] Azure subscription with **Contributor** or **Owner** role
-- [ ] Entra ID tenant access
-- [ ] Strong admin password for session host VMs
+- [ ] Azure CLI v2.40+ installed.
+- [ ] Bicep CLI v0.20+ (included with Azure CLI v2.20+).
+- [ ] PowerShell 5.1+.
+- [ ] Azure subscription with **Contributor** or **Owner** role.
+- [ ] Entra ID tenant access.
+- [ ] Strong admin password for session host VMs.
 
 For detailed setup, see [Prerequisites Guide](prerequisites.md).
 
@@ -38,23 +38,28 @@ This template is **fully idempotent**, meaning:
 - **CI/CD ready**: Suitable for automated deployment pipelines.
 
 **Technical implementation:**
-- All resource names are stable via `uniqueString()`
-- Idempotent operations use `dependsOn` and stable naming
-- No random naming that could cause duplicates
+- All resource names are stable via `uniqueString()`.
+- Idempotent operations use `dependsOn` and stable naming.
+- No random naming that could cause duplicates.
 
 ### Session Host Extension Architecture
 
-The deployment combines AVD Agent and BootLoader installation into a **single `CustomScriptExtension`** for each VM:
+The deployment uses two extensions deployed in sequence on each VM:
 
-**Why?** Azure Windows VMs support only one CustomScript handler per VM. Attempting multiple CustomScriptExtensions with the same handler causes `BadRequest: BadRequest` errors.
+**1. AADLoginForWindows:**
+- Publisher: Microsoft.Azure.ActiveDirectory.
+- Purpose: Enables Entra ID authentication and login on the VM.
+- Allows users to sign in with their Entra ID credentials.
+- Deployed first; must complete before DSC extension.
 
-**How?** Both installation scripts run sequentially within a single extension execution, executing commands in order:
-1. Download and install AVD Agent using registration token
-2. Configure Entra ID join settings
-3. Install BootLoader
-4. Trigger system reboot for Entra ID join completion
+**2. DSC (Desired State Configuration):**
+- Publisher: Microsoft.Powershell.
+- Version: 2.73.
+- Purpose: Registers the VM as a session host in the AVD host pool using the registration token.
+- Runs after AADLoginForWindows completes (dependency enforced).
+- Configures the VM to join the host pool with Entra ID authentication enabled.
 
-**Benefit:** Reliable, conflict-free deployment that works correctly on redeployment without duplicate extensions.
+**Benefit:** Clean separation of concerns—Entra ID authentication is configured first, then AVD host pool registration follows. Deployment is reliable and works correctly on redeployment.
 
 ### Explicit Outbound Connectivity (March 2026 Compliance)
 
@@ -63,32 +68,32 @@ Starting March 31, 2026, Azure requires **explicit outbound connectivity methods
 #### Implementation
 
 **Standard Public IPs on NICs**
-- Each session host VM gets a Standard Public IP address
-- Public IPs attached to VM network interfaces (not standalone)
-- Provides explicit outbound NAT gateway
+- Each session host VM gets a Standard Public IP address.
+- Public IPs attached to VM network interfaces (not standalone).
+- Provides explicit outbound NAT gateway.
 
 **Service Endpoints (cost-free optimization)**
-- Optimised routes to Azure services (Storage, Key Vault, Entra AD)
-- Zero additional cost
-- Reduces data egress charges
+- Optimised routes to Azure services (Storage, Key Vault, Entra AD).
+- Zero additional cost.
+- Reduces data egress charges.
 
 **Network Defaults**
-- Subnets have `defaultOutboundAccess: false` (explicitly disabled)
-- Forces all outbound traffic through Public IP (no hidden implicit access)
+- Subnets have `defaultOutboundAccess: false` (explicitly disabled).
+- Forces all outbound traffic through Public IP (no hidden implicit access).
 
 #### Public IP Lifecycle
 
-- **Initial Deployment**: Bicep creates Standard Public IPs and associates them with VM NICs
-- **When Stopping VMs**: `Stop-AvdOccasional.ps1` deallocates VMs, then **deletes Public IPs** (saves ~£2–3/month per VM)
-- **When Starting VMs**: `Start-AvdOccasional.ps1` creates **new Public IPs**, associates them with NICs, then starts VMs
-- **IP Address Changes**: Public IPs get new addresses each start cycle (acceptable and expected for outbound-only connectivity)
+- **Initial Deployment**: Bicep creates Standard Public IPs and associates them with VM NICs.
+- **When Stopping VMs**: `Stop-AvdOccasional.ps1` deallocates VMs, then **deletes Public IPs** (saves ~£2–3/month per VM).
+- **When Starting VMs**: `Start-AvdOccasional.ps1` creates **new Public IPs**, associates them with NICs, then starts VMs.
+- **IP Address Changes**: Public IPs get new addresses each start cycle (acceptable and expected for outbound-only connectivity).
 
 **Why This Approach:**
-- ✅ **Compliant** – Meets Azure's explicit outbound requirement
-- ✅ **Cost-optimized** – £0/month when VMs stopped (vs ~£2–3/month if kept)
-- ✅ **Secure** – NSG blocks ALL inbound traffic; IPs are outbound-only
-- ✅ **Automated** – Start/Stop scripts handle entire lifecycle
-- ✅ **Fully functional** – Provides internet access for updates, DSC downloads, browsing
+- ✅ **Compliant** – Meets Azure's explicit outbound requirement.
+- ✅ **Cost-optimized** – £0/month when VMs stopped (vs ~£2–3/month if kept).
+- ✅ **Secure** – NSG blocks ALL inbound traffic; IPs are outbound-only.
+- ✅ **Automated** – Start/Stop scripts handle entire lifecycle.
+- ✅ **Fully functional** – Provides internet access for updates, DSC downloads, browsing.
 
 ---
 
@@ -261,7 +266,7 @@ az deployment group show --resource-group avd-occasional-rg `
 - 1 Host Pool
 - 1 Workspace
 - 1 Application Group
-- 1 User-assigned Managed Identity
+- 1 System-assigned Managed Identity
 
 ### 9. Configure User Access (Required)
 

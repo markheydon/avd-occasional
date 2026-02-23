@@ -13,12 +13,12 @@ Cost-effective **Azure Virtual Desktop** infrastructure for occasional work sess
 
 ## ⚡ Why This Project?
 
-- **Personal desktop** – Purpose-built for individual occasional use
-- **Cost optimised** – £2–3/month idle, £94–126/month active (98% savings when deallocated)
-- **Infrastructure as Code** – Reproducible, version-controlled Bicep templates
-- **Easy lifecycle** – Deploy once, deallocate/start as needed
-- **Cloud-native** – Entra ID-joined VMs, no on-premises AD required
-- **March 2026 compliant** – Explicit outbound connectivity with Standard Public IPs
+- **Personal desktop** – Purpose-built for individual occasional use.
+- **Cost optimised** – £2–3/month idle, £94–126/month active (98% savings when deallocated).
+- **Infrastructure as Code** – Reproducible, version-controlled Bicep templates.
+- **Easy lifecycle** – Deploy once, deallocate/start as needed.
+- **Cloud-native** – Entra ID-joined VMs, no on-premises AD required.
+- **March 2026 compliant** – Explicit outbound connectivity with Standard Public IPs.
 
 ## 🚀 Quick Start (5 minutes)
 
@@ -67,9 +67,9 @@ az login
 | **Savings** | **~98%** | Cost reduction when deallocated vs running |
 
 **Component breakdown:**
-- Session Host VM: £90–120/month (active) → £0 (deallocated)
-- Public IP: £2–3/month (active) → £0 (deallocated & deleted)
-- OS Disk: £2–3/month (always charged)
+- Session Host VM: £90–120/month (active) → £0 (deallocated).
+- Public IP: £2–3/month (active) → £0 (deallocated & deleted).
+- OS Disk: £2–3/month (always charged).
 
 See [Detailed Deployment: Cost Analysis](deployment-detailed.md#cost-analysis) for scaling costs and optimisation strategies.
 
@@ -97,7 +97,7 @@ See [Detailed Deployment: Cost Analysis](deployment-detailed.md#cost-analysis) f
 ```
 
 **Key features:**
-- Entra ID-joined VMs (cloud-native, no VPN required)
+- Entra ID-joined VMs (cloud-native, no VPN required).
 - No inbound public ports (reverse connection only)
 - Public IPs deleted when VMs stopped (cost optimisation)
 - Service Endpoints for optimised Azure service routing

@@ -39,7 +39,7 @@ $deployParams = @(
     "--name", "avd-deploy-$(Get-Date -Format 'yyyyMMddhhmmss')"
     "--resource-group", $ResourceGroupName
     "--template-file", $TemplateFile
-    "--parameters", $ParametersFile
+    "--parameters", "@$ParametersFile"
 )
 
 # Only pass parameters that override the file values if user explicitly provided them
@@ -125,9 +125,8 @@ Write-Host ""
 
 # Prompt for admin password if not provided
 if (-not $AdminPassword) {
-    Write-Host "ERROR: Admin password is required for deployment." -ForegroundColor Red
-    Write-Host "Please provide the admin password using -AdminPassword parameter" -ForegroundColor Red
-    exit 1
+    Write-Host "Admin password was not provided. You will be prompted to enter it now." -ForegroundColor Yellow
+    $AdminPassword = Read-Host -AsSecureString -Prompt "Enter the local administrator password for the session host VMs"
 }
 
 az deployment group create @deployParams

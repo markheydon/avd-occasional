@@ -42,6 +42,23 @@ This file provides guidelines for GitHub Copilot and other coding agents to ensu
 - Update `README.md` with any changes to deployment instructions or architecture.
 - Document new modules with usage examples.
 
+### Markdown Style Guide
+
+**Bulleted Lists (Regular Content)**
+- All bullet items must end with a full stop (period).
+- Examples: "Install Azure CLI with the installer.", "Navigate to the portal."
+
+**Task Lists (Numbered Steps)**
+- Numbered task lists should NOT end with a full stop.
+- Examples:
+  1. Clone the repository
+  2. Install dependencies
+  3. Run the deployment script
+
+**UK English Spelling**
+- Use UK English spelling: "colour", "organisation", "customise", etc.
+- Use consistent terminology (e.g., "Entra ID" not "Azure AD").
+
 ## PowerShell Scripts
 
 All deployment and management scripts follow PowerShell cmdlet naming conventions:

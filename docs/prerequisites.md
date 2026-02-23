@@ -40,9 +40,9 @@ git --version
 
 ### Azure Subscription
 
-- ✅ Active Azure subscription
-- ✅ **Contributor** or **Owner** role on the subscription
-- ✅ Quota available for virtual machines in your chosen region
+- ✅ Active Azure subscription.
+- ✅ **Contributor** or **Owner** role on the subscription.
+- ✅ Quota available for virtual machines in your chosen region.
 
 To verify your role:
 
@@ -52,9 +52,9 @@ az role assignment list --assignee (az account show --query user.name -o tsv) --
 
 ### Entra ID (Azure AD)
 
-- ✅ Entra ID tenant access (usually available to organisations using Microsoft 365)
-- ✅ User account in the Entra ID tenant
-- ✅ Ability to create role assignments (typically available to Global Admins or subscription Owners)
+- ✅ Entra ID tenant access (usually available to organisations using Microsoft 365).
+- ✅ User account in the Entra ID tenant.
+- ✅ Ability to create role assignments (typically available to Global Admins or subscription Owners).
 
 To verify Entra ID access:
 
@@ -67,15 +67,15 @@ az ad signed-in-user show
 Deploy in a region that supports all required services:
 
 **Supported UK regions:**
-- `uksouth`
-- `ukwest` (default in this template)
+- `uksouth`.
+- `ukwest` (default in this template).
 
 **Other popular regions:**
-- `northeurope`
-- `westeurope`
-- `eastus`
-- `westus2`
-- `canadacentral`
+- `northeurope`.
+- `westeurope`.
+- `eastus`.
+- `westus2`.
+- `canadacentral`.
 
 ## Security & Credentials
 
@@ -85,11 +85,11 @@ The deployment requires a strong admin password for session host VMs:
 
 | Requirement | Details |
 |-------------|---------|
-| Username | Alphanumeric, can contain `.`, `-`, `_` (not allowed: spaces, special chars) |
-| Default username | `avdadmin` (configurable) |
-| Password | **Must be strong**: 8+ chars, mixed case, numbers, special chars |
-| Storage | **Never stored in `parameters.json`** – prompted at deployment time |
-| Encryption | Marked `@secure()` in Bicep; not logged in Azure activity |
+| Username | Alphanumeric, can contain `.`, `-`, `_` (not allowed: spaces, special chars). |
+| Default username | `avdadmin` (configurable). |
+| Password | **Must be strong**: 8+ chars, mixed case, numbers, special chars. |
+| Storage | **Never stored in `parameters.json`** – prompted at deployment time. |
+| Encryption | Marked `@secure()` in Bicep; not logged in Azure activity. |
 
 ### Generate Secure Password (PowerShell)
 

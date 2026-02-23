@@ -11,7 +11,7 @@ param(
 Write-Host "Starting VMs in resource group: $ResourceGroupName..." -ForegroundColor Cyan
 
 # Get all deallocated VMs
-$vms = az vm list --resource-group $ResourceGroupName --query "[?tags.project=='avd-occasional'].name" -o tsv
+$vms = az vm list --resource-group $ResourceGroupName --show-details --query "[?tags.project=='avd-occasional' && powerState=='VM deallocated'].name" -o tsv
 
 if (-not $vms) {
     Write-Host "No VMs found matching the AVD pattern in $ResourceGroupName." -ForegroundColor Yellow

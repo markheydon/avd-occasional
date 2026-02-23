@@ -4,7 +4,8 @@
 # ===================================
 
 param(
-    [string]$ResourceGroupName = "avd-occasional-rg"
+    [string]$ResourceGroupName = "avd-occasional-rg",
+    [switch]$Force
 )
 
 Write-Host "Stopping VMs in resource group: $ResourceGroupName..." -ForegroundColor Cyan
@@ -25,6 +26,20 @@ if ($vms -is [string]) {
 Write-Host "Found $($vms.Count) VM(s) to stop:" -ForegroundColor Yellow
 $vms | ForEach-Object { Write-Host "  - $_" }
 Write-Host ""
+
+# Interactive confirmation unless -Force is specified
+if (-not $Force) {
+    Write-Host "WARNING: This will stop VMs and delete associated Public IPs." -ForegroundColor Yellow
+    Write-Host "This may temporarily disrupt service until VMs are restarted." -ForegroundColor Yellow
+    Write-Host ""
+    $confirmation = Read-Host "Are you sure you want to proceed? (yes/no)"
+    
+    if ($confirmation -ne 'yes') {
+        Write-Host "Operation cancelled." -ForegroundColor Cyan
+        exit 0
+    }
+    Write-Host ""
+}
 
 # Stop each VM
 foreach ($vm in $vms) {

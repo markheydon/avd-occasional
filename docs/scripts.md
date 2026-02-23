@@ -15,17 +15,18 @@ This guide documents the PowerShell scripts included in the `scripts/` folder an
 | `Start-AvdOccasional.ps1` | Start deallocated session host VMs | Before working session |
 | `Stop-AvdOccasional.ps1` | Deallocate VMs and clean up costs | After working session |
 | `Remove-AvdOccasional.ps1` | Delete all resources permanently | When no longer needed |
+| `Test-AvdSessionHost.ps1` | Diagnose session host connectivity issues | When troubleshooting problems |
 
 ## Deploy-AvdOccasional.ps1
 
 **Purpose:** Deploy or update Azure Virtual Desktop infrastructure using Bicep templates.
 
 **When to use:**
-- Initial deployment
-- Scaling (adding more VMs)
-- Changing workload size (light ↔ moderate)
-- Redeploy after resource deletion
-- Apply configuration updates
+- Initial deployment.
+- Scaling (adding more VMs).
+- Changing workload size (light ↔ moderate).
+- Redeploy after resource deletion.
+- Apply configuration updates.
 
 ### Basic Usage
 
@@ -90,24 +91,24 @@ $adminPassword = Read-Host "Enter password" -AsSecureString
   -WhatIf -Verbose
 ```
 
-### Deployment Time
+**Deployment Time**
 
-- **Initial deployment**: 15–20 minutes (includes VM creation, agent installation, Entra ID joining)
-- **Rerun (no changes)**: 3–5 minutes (validates existing resources)
-- **Scaling (add VMs)**: 10–15 minutes (new VMs only)
+- **Initial deployment**: 15–20 minutes (includes VM creation, agent installation, Entra ID joining).
+- **Rerun (no changes)**: 3–5 minutes (validates existing resources).
+- **Scaling (add VMs)**: 10–15 minutes (new VMs only).
 
 ### Behind the Scenes
 
-1. Creates Azure Resource Group: `avd-occasional-rg`
-2. Compiles Bicep templates (`infra/main.bicep` and modules)
-3. Validates template against Azure
+1. Creates Azure Resource Group: `avd-occasional-rg`.
+2. Compiles Bicep templates (`infra/main.bicep` and modules).
+3. Validates template against Azure.
 4. Deploys resources in dependency order:
-   - Network infrastructure (VNet, NSG, Subnet)
-   - Azure Virtual Desktop (Host Pool, Workspace, Application Group)
-   - Session Host VMs
-   - Public IPs
-   - Custom Script extensions (installs AVD Agent, performs Entra ID join)
-5. Validates deployment completion
+   - Network infrastructure (VNet, NSG, Subnet).
+   - Azure Virtual Desktop (Host Pool, Workspace, Application Group).
+   - Session Host VMs.
+   - Public IPs.
+   - Custom Script extensions (installs AVD Agent, performs Entra ID join).
+5. Validates deployment completion.
 
 ### Troubleshooting
 
@@ -125,8 +126,8 @@ See [Troubleshooting Guide: Deployment Issues](troubleshooting.md#deployment-iss
 - When resuming work after shutdown
 
 **Why both the script and manual start exist:**
-- Script automates Public IP recreation (required for outbound connectivity)
-- Manual `az vm start` would leave VMs without outbound access
+- Script automates Public IP recreation (required for outbound connectivity).
+- Manual `az vm start` would leave VMs without outbound access.
 
 ### Basic Usage
 
@@ -136,9 +137,6 @@ See [Troubleshooting Guide: Deployment Issues](troubleshooting.md#deployment-iss
 
 # Start and wait for VMs to be fully running (recommended for automation)
 .\scripts\Start-AvdOccasional.ps1 -WaitForStartup
-
-# Start with custom timeout (wait up to 5 minutes)
-.\scripts\Start-AvdOccasional.ps1 -WaitForStartup -WaitTimeoutSeconds 300
 ```
 
 ### Parameters
@@ -146,7 +144,6 @@ See [Troubleshooting Guide: Deployment Issues](troubleshooting.md#deployment-iss
 | Parameter | Type | Default | Notes |
 |-----------|------|---------|-------|
 | `WaitForStartup` | Switch | N/A | Block until VMs fully running. Useful for scripts and automation. |
-| `WaitTimeoutSeconds` | Int | `180` (3 min) | Maximum wait time. If VMs don't start within this time, returns with status. |
 
 ### What It Does
 
@@ -173,12 +170,6 @@ See [Troubleshooting Guide: Deployment Issues](troubleshooting.md#deployment-iss
 
 Subsequent commands can assume VMs are running.
 
-**Start with extended timeout (for slow regions):**
-
-```powershell
-.\scripts\Start-AvdOccasional.ps1 -WaitForStartup -WaitTimeoutSeconds 600  # 10 min
-```
-
 ### Expected Output
 
 ```
@@ -187,7 +178,6 @@ Creating Public IP addresses...
   - avd-dev-pip-0 created
 Starting VMs...
   - avd-dev-vm-0 started
-Waiting for VMs to be fully running (timeout: 180 seconds)...
   - avd-dev-vm-0: PowerState/running (after ~45 seconds)
 ✓ All VMs started successfully
 VM Status:
@@ -401,6 +391,115 @@ $adminPassword = Read-Host "Enter password" -AsSecureString
 ```
 
 Redeploy creates new resources; recreated VMs will have new public IP addresses and names but same internal configuration.
+
+---
+
+## Test-AvdSessionHost.ps1
+
+**Purpose:** Diagnose session host connectivity and status issues by checking VM power state, extensions, AVD registration, and Entra ID join configuration.
+
+**When to use:**
+- Session host status shows as unavailable or unhealthy.
+- Cannot connect to desktop in Windows App.
+- After VM restart or redeployment.
+- When verifying post-deployment configuration.
+
+### Basic Usage
+
+```powershell
+# Auto-discover and diagnose (recommended)
+.\scripts\Test-AvdSessionHost.ps1
+
+# Specific resource group
+.\scripts\Test-AvdSessionHost.ps1 -ResourceGroupName avd-occasional-rg
+
+# Specific host pool and VM
+.\scripts\Test-AvdSessionHost.ps1 `
+  -ResourceGroupName avd-occasional-rg `
+  -HostPoolName avd-dev-hp-zx4itrg75d2kc `
+  -VmName avd-dev-vm-0-zx4itrg75d2kc
+```
+
+### Parameters
+
+| Parameter | Type | Default | Notes |
+|-----------|------|---------|-------|
+| `ResourceGroupName` | String | `avd-occasional-rg` | Resource group containing AVD resources. |
+| `HostPoolName` | String | (auto-discovered) | AVD host pool name. Auto-discovered if not specified. |
+| `VmName` | String | (auto-discovered) | Session host VM name. Auto-discovered if not specified. |
+
+### What It Checks
+
+1. **VM Power State** — Whether VM is running or deallocated.
+2. **VM Extensions** — Status of AADLoginForWindows and DSC extensions.
+3. **AVD Session Host Status** — Checks if session host is registered and Available in the host pool.
+4. **RDP Properties** — Verifies Entra ID authentication is configured (targetisaadjoined:i:1).
+5. **Entra ID Join** — Confirms AADLoginForWindows extension is installed and active.
+6. **Heartbeat** — Checks when AVD agent last reported (indicates agent health).
+
+### Example Output
+
+```
+=== AVD Session Host Diagnostics ===
+Auto-discovering AVD resources in resource group: avd-occasional-rg
+
+Discovering host pool...
+  Found: avd-dev-hp-zx4itrg75d2kc
+Discovering VMs...
+  Found: avd-dev-vm-0-zx4itrg75d2kc
+
+Resource Group: avd-occasional-rg
+Host Pool: avd-dev-hp-zx4itrg75d2kc
+VM Name: avd-dev-vm-0-zx4itrg75d2kc
+
+Checking VM power state...
+  Power State: VM running
+
+Checking VM extensions...
+  [AADLoginForWindows]: Succeeded
+  [avd-dev-vm-0-AddSessionHost]: Succeeded
+
+Checking session host status in AVD...
+  Status: Available
+  Update State: Latest
+  Last Heartbeat: 2026-02-23T14:30:45.1234567Z
+  OS Version: Windows 11 Enterprise
+
+Checking host pool RDP properties...
+  Custom RDP Properties: targetisaadjoined:i:1;enablerdsaadauth:i:1
+  Entra ID auth properties: CONFIGURED
+
+Checking Entra ID join status...
+  AADLoginForWindows extension: Succeeded
+
+=== Recommendations ===
+• Session host is Available and ready for connections!
+```
+
+### Interpreting Results
+
+**If Power State is "VM deallocated":**
+- Start the VM: `.\scripts\Start-AvdOccasional.ps1`
+
+**If Session Host Status is not "Available":**
+- Check if extensions are Succeeded (all should show green)
+- Verify last heartbeat is recent (within 5 minutes means agent is active)
+- If heartbeat is old (>15 minutes), restart the VM
+
+**If Entra ID auth is "MISSING":**
+- Host pool RDP properties need updating
+- Redeploy using: `.\scripts\Deploy-AvdOccasional.ps1`
+
+**If heartbeat is excessive (>15 minutes old):**
+- AVD agent may have crashed; restart VM:
+  ```powershell
+  .\scripts\Stop-AvdOccasional.ps1 -Force
+  .\scripts\Start-AvdOccasional.ps1 -WaitForStartup
+  ```
+
+### Troubleshooting with Test Results
+
+See [Troubleshooting Guide: Diagnosis Steps](troubleshooting.md#diagnosis-with-test-avdsessionhost) for interpreting specific diagnostic results.
 
 ---
 

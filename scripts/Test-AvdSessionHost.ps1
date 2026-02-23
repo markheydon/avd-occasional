@@ -174,45 +174,48 @@ if ($vmPowerState -ne "VM running") {
     Write-Host "• VM is not running. Start the VM first." -ForegroundColor Yellow
 }
 
-if ($targetHost.properties.status -ne "Available") {
-    Write-Host "• Session host status is '$($targetHost.properties.status)'" -ForegroundColor Yellow
-    
-    if (-not ($rdpProps -match "targetisaadjoined:i:1" -and $rdpProps -match "enablerdsaadauth:i:1")) {
-        Write-Host "• Update host pool with Entra ID RDP properties in avd-pool.bicep" -ForegroundColor Yellow
-        Write-Host "  Add: enablerdsaadauth:i:1 to customRdpProperty" -ForegroundColor Cyan
-    }
-    
-    if ($targetHost.properties.lastHeartBeat) {
-        try {
-            $lastHeartbeat = [DateTime]::ParseExact(
-                $targetHost.properties.lastHeartBeat,
-                'MM/dd/yyyy HH:mm:ss',
-                [System.Globalization.CultureInfo]::InvariantCulture
-            )
-            $minutesSinceHeartbeat = ([DateTime]::UtcNow - $lastHeartbeat).TotalMinutes
-            
-            if ($minutesSinceHeartbeat -lt 5) {
-                Write-Host "• AVD agent is active (heartbeat $([Math]::Round($minutesSinceHeartbeat, 1)) minutes ago)" -ForegroundColor Green
-                Write-Host "• The session host may take a few more minutes to become Available" -ForegroundColor Yellow
-                Write-Host "  Wait 2-5 minutes and run this diagnostic again" -ForegroundColor Cyan
-            } elseif ($minutesSinceHeartbeat -lt 15) {
-                Write-Host "• AVD agent last reported $([Math]::Round($minutesSinceHeartbeat)) minutes ago" -ForegroundColor Yellow
-                Write-Host "  Wait a bit longer or restart the VM if it doesn't recover" -ForegroundColor Cyan
-            } else {
-                Write-Host "• AVD agent hasn't sent heartbeat in $([Math]::Round($minutesSinceHeartbeat)) minutes" -ForegroundColor Red
-                Write-Host "  Restart the VM to reinitialize the agent:" -ForegroundColor Cyan
-                Write-Host "  .\scripts\Stop-AvdOccasional.ps1 -ResourceGroupName $ResourceGroupName" -ForegroundColor Cyan
-                Write-Host "  .\scripts\Start-AvdOccasional.ps1 -ResourceGroupName $ResourceGroupName" -ForegroundColor Cyan
-            }
+if ($null -ne $targetHost) {
+    if ($targetHost.properties.status -ne "Available") {
+        Write-Host "• Session host status is '$($targetHost.properties.status)'" -ForegroundColor Yellow
+        
+        if (-not ($rdpProps -match "targetisaadjoined:i:1" -and $rdpProps -match "enablerdsaadauth:i:1")) {
+            Write-Host "• Update host pool with Entra ID RDP properties in avd-pool.bicep" -ForegroundColor Yellow
+            Write-Host "  Add: enablerdsaadauth:i:1 to customRdpProperty" -ForegroundColor Cyan
         }
-        catch {
-            Write-Host "• Last Heartbeat: $($targetHost.properties.lastHeartBeat) (unable to parse datetime)" -ForegroundColor Yellow
+        
+        if ($targetHost.properties.lastHeartBeat) {
+            try {
+                $lastHeartbeat = [System.DateTimeOffset]::Parse(
+                    $targetHost.properties.lastHeartBeat,
+                    [System.Globalization.CultureInfo]::InvariantCulture,
+                    [System.Globalization.DateTimeStyles]::RoundtripKind
+                )
+                $minutesSinceHeartbeat = ([System.DateTimeOffset]::UtcNow - $lastHeartbeat).TotalMinutes
+
+                if ($minutesSinceHeartbeat -lt 5) {
+                    Write-Host "• AVD agent is active (heartbeat $([Math]::Round($minutesSinceHeartbeat, 1)) minutes ago)" -ForegroundColor Green
+                    Write-Host "• The session host may take a few more minutes to become Available" -ForegroundColor Yellow
+                    Write-Host "  Wait 2-5 minutes and run this diagnostic again" -ForegroundColor Cyan
+                } elseif ($minutesSinceHeartbeat -lt 15) {
+                    Write-Host "• AVD agent last reported $([Math]::Round($minutesSinceHeartbeat)) minutes ago" -ForegroundColor Yellow
+                    Write-Host "  Wait a bit longer or restart the VM if it doesn't recover" -ForegroundColor Cyan
+                } else {
+                    Write-Host "• AVD agent hasn't sent heartbeat in $([Math]::Round($minutesSinceHeartbeat)) minutes" -ForegroundColor Red
+                    Write-Host "  Restart the VM to reinitialize the agent:" -ForegroundColor Cyan
+                    Write-Host "  .\scripts\Stop-AvdOccasional.ps1 -ResourceGroupName $ResourceGroupName" -ForegroundColor Cyan
+                    Write-Host "  .\scripts\Start-AvdOccasional.ps1 -ResourceGroupName $ResourceGroupName" -ForegroundColor Cyan
+                }
+            }
+            catch {
+                Write-Host "• Last Heartbeat: $($targetHost.properties.lastHeartBeat) (unable to parse datetime)" -ForegroundColor Yellow
+            }
+        } else {
+            Write-Host "• No heartbeat data available from AVD agent" -ForegroundColor Red
         }
     } else {
-        Write-Host "• No heartbeat data available from AVD agent" -ForegroundColor Red
+        Write-Host "• Session host is Available and ready for connections!" -ForegroundColor Green
     }
 } else {
-    Write-Host "• Session host is Available and ready for connections!" -ForegroundColor Green
+    Write-Host "• Session host not found in host pool. Verify VM is correctly associated with the host pool." -ForegroundColor Red
 }
-
 Write-Host ""
