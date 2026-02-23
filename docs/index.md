@@ -1,120 +1,164 @@
 ---
 layout: default
-title: AVD Occasional
+title: Azure Virtual Desktop - Occasional Use
 ---
 
-# Azure Virtual Desktop - Occasional Use
+# Azure Virtual Desktop for Occasional Use
 
 [![Bicep Lint](https://github.com/markheydon/avd-occasional/actions/workflows/bicep-lint.yml/badge.svg)](https://github.com/markheydon/avd-occasional/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Bicep](https://img.shields.io/badge/IaC-Bicep-blue)](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/)
 
-Cost-effective **Azure Virtual Desktop** infrastructure for occasional work sessions. Deploy in minutes, deallocate to save 90% on costs, resume whenever needed.
+Cost-effective **Azure Virtual Desktop** infrastructure for occasional work sessions. Deploy in minutes, deallocate to save 98% on costs, resume whenever needed.
 
 ## ⚡ Why This Project?
 
-- **Personal desktop** purpose-built for individual occasional use.
-- **Cost optimized** - £10-15/month idle vs £100-120/month active.
-- **Infrastructure as Code** - Reproducible, version-controlled Bicep templates.
-- **Easy lifecycle** - Deploy once, deallocate/start as needed.
-- **Production ready** - Best practices, security, monitoring included.
+- **Personal desktop** – Purpose-built for individual occasional use
+- **Cost optimised** – £2–3/month idle, £94–126/month active (98% savings when deallocated)
+- **Infrastructure as Code** – Reproducible, version-controlled Bicep templates
+- **Easy lifecycle** – Deploy once, deallocate/start as needed
+- **Cloud-native** – Entra ID-joined VMs, no on-premises AD required
+- **March 2026 compliant** – Explicit outbound connectivity with Standard Public IPs
 
-## 📚 Documentation
-
-| Document | Purpose |
-|----------|---------|
-| **[Quick Start](../README.md#quick-start)** | Get up and running in 5 minutes. |
-| **[Full README](../README.md)** | Complete overview and reference. |
-| **[Deployment Guide](../DEPLOYMENT.md)** | Detailed step-by-step walkthrough. |
-| **[Contributing](../CONTRIBUTING.md)** | How to contribute improvements. |
-| **[Changelog](../CHANGELOG.md)** | Version history and updates. |
-
-## 🚀 Quick Start
+## 🚀 Quick Start (5 minutes)
 
 ```powershell
-# Clone
+# 1. Clone and authenticate
 git clone https://github.com/markheydon/avd-occasional.git
 cd avd-occasional
-
-# Authenticate
 az login
 
-# Deploy (15-20 min)
+# 2. Deploy infrastructure (15–20 minutes)
 .\scripts\Deploy-AvdOccasional.ps1
 
-# Later: Save 90% on costs
+# 3. Assign role permissions (both required)
+# See Quick Start Guide for detailed role assignment commands
+
+# 4. Connect
+# Use Windows App (Microsoft Store) to connect to your desktop
+
+# Later: Save costs
 .\scripts\Stop-AvdOccasional.ps1
 
 # Resume when needed
 .\scripts\Start-AvdOccasional.ps1
 ```
 
+**Full instructions**: [Quick Start Guide](quickstart.md)
+
+## 📚 Documentation
+
+| Document | Purpose |
+|----------|---------|
+| **[Quick Start](quickstart.md)** | Get up and running in ~25 minutes (includes 5–10 min role propagation). |
+| **[Prerequisites](prerequisites.md)** | Tools, Azure setup, role assignments, and security requirements. |
+| **[Architecture Overview](architecture.md)** | How components work together, cost drivers, security model. |
+| **[Detailed Deployment](deployment-detailed.md)** | Step-by-step walkthrough, customisation, and advanced options. |
+| **[Troubleshooting](troubleshooting.md)** | Common issues and solutions. |
+| **[Scripts Reference](scripts.md)** | PowerShell commands: Deploy, Start, Stop, Remove. |
+
 ## 💰 Cost Profile
 
 | State | Monthly Cost | Notes |
 |-------|-------------|-------|
-| **Deallocated** | £10-15 | Storage only, VMs paused. |
-| **Running** | £100-120 | Full compute (D2s_v3, moderate). |
-| **Deleted** | £0 | Requires 15-min redeploy. |
+| **Deallocated** | £2–3 | VMs stopped, disks retained (instant resume) |
+| **Running** | £94–126 | Full D2s_v3 compute (1 VM, moderate workload) |
+| **Deleted** | £0 | Complete removal (15–20 min redeploy) |
+| **Savings** | **~98%** | Cost reduction when deallocated vs running |
 
-## 🏗️ Architecture
+**Component breakdown:**
+- Session Host VM: £90–120/month (active) → £0 (deallocated)
+- Public IP: £2–3/month (active) → £0 (deallocated & deleted)
+- OS Disk: £2–3/month (always charged)
+
+See [Detailed Deployment: Cost Analysis](deployment-detailed.md#cost-analysis) for scaling costs and optimisation strategies.
+
+## 🏗️ Architecture at a Glance
 
 ```
-Internet User
-    ↓
-Windows App (or RDP Client)
-    ↓
-Azure Virtual Desktop Service (secure reverse connection)
-    ↓
-Personal Session Host VM (in isolated VNet)
-    ↓
-Your Desktop
+┌─────────────────────────────────────────┐
+│ Internet User                           │
+│ (Windows App or RDP Client)             │
+└──────────────────┬──────────────────────┘
+                   │
+        ▼ Secure reverse connection
+   ┌──────────────────────────────┐
+   │ Azure Virtual Desktop Service │
+   └──────────────────┬────────────┘
+                      │
+        ▼ Isolated virtual network
+   ┌─────────────────────────────────────┐
+   │ VNet: 10.0.0.0/16                   │
+   │ ├─ Session Host VM (Entra ID-joined)│
+   │ ├─ Public IP (outbound only)        │
+   │ ├─ NSG (inbound deny)               │
+   │ └─ Service Endpoints (free routes)  │
+   └─────────────────────────────────────┘
 ```
 
-**Security**: No public IPs, no inbound ports required, NSG minimal.
+**Key features:**
+- Entra ID-joined VMs (cloud-native, no VPN required)
+- No inbound public ports (reverse connection only)
+- Public IPs deleted when VMs stopped (cost optimisation)
+- Service Endpoints for optimised Azure service routing
+- Fully idempotent deployment
+
+See [Architecture Overview](architecture.md) for detailed component descriptions.
 
 ## 🎯 Use Cases
 
-✅ **Remote work from alternate location** - Coffee shop, family visit, travel.
-✅ **Temporary compute needs** - Project work, testing, demos.
-✅ **Cost-sensitive scenarios** - Deallocate after use.
-✅ **Personal productivity** - Persistent desktop, Entra ID auth.
+✅ **Remote work from alternate location** – Coffee shop, co-working, travel  
+✅ **Temporary compute needs** – Project work, testing, demos  
+✅ **Cost-sensitive scenarios** – Deallocate between sessions  
+✅ **Personal productivity** – Persistent desktop, cloud-native identity  
 
-❌ **Not for**: Pooled multi-user scenarios (use Pooled template instead).
-❌ **Not for**: Always-on production (consider regular Azure VM pricing).
+❌ **Not for:** Pooled multi-user scenarios  
+❌ **Not for:** Always-on production workloads
 
 ## 🔧 Key Features
 
-- ✅ **Bicep IaC** - Reproducible, auditable infrastructure.
-- ✅ **Parameterized** - Switch workload size (light/moderate) with one parameter.
-- ✅ **Personal desktop** - Single user, persistent configuration.
-- ✅ **Entra ID auth** - Cloud-native identity.
-- ✅ **Deallocate pattern** - Stop VMs to save costs, resume instantly.
-- ✅ **Automated scripts** - Deploy, start, deallocate, cleanup.
-- ✅ **Minimal security** - Reverse connections, NSG included.
-- ✅ **UK region** - Configured for ukwest by default.
+- ✅ **Bicep Infrastructure as Code** – Reproducible, auditable, version-controlled
+- ✅ **Parameterised configuration** – Switch workload size (light/moderate) in one parameter
+- ✅ **Personal desktop** – Single user, persistent configuration
+- ✅ **Entra ID authentication** – Cloud-native identity, supports passwordless auth
+- ✅ **Deallocate pattern** – Stop VMs to save costs, resume in 2–3 minutes
+- ✅ **Automated lifecycle scripts** – Deploy, start, deallocate, cleanup
+- ✅ **Minimal security** – Reverse connections, NSG included, no RDP ports
+- ✅ **UK-friendly defaults** – Region: `ukwest`, pricing in GBP
+- ✅ **March 2026 compliant** – Explicit outbound connectivity via Standard Public IPs
 
-## 📋 Prerequisites
+## 📋 Prerequisites at a Glance
 
-- Azure CLI v2.40+.
-- Azure subscription (Contributor role).
-- PowerShell 5.1+.
-- Entra ID user account.
+| Requirement | Status | Details |
+|-------------|--------|---------|
+| **Azure CLI** | Required | v2.40+ ([Install](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli)) |
+| **Bicep CLI** | Required | Included with Azure CLI 2.20+ |
+| **PowerShell** | Required | 5.1+ ([Install](https://aka.ms/PSWindows)) |
+| **Git** | Required | Clone repository ([Download](https://git-scm.com)) |
+| **Azure subscription** | Required | Contributor or Owner role |
+| **Entra ID tenant** | Required | Usually available with Microsoft 365 |
+
+For full prerequisite details, see [Prerequisites Guide](prerequisites.md).
+
+## 📖 Next Steps
+
+1. **New to this project?** Start with [Quick Start](quickstart.md)
+2. **Need environment setup?** See [Prerequisites](prerequisites.md)
+3. **Want to understand how it works?** Read [Architecture Overview](architecture.md)
+4. **Detailed walkthrough?** Follow [Detailed Deployment Guide](deployment-detailed.md)
+5. **Troubleshooting?** Check [Troubleshooting Guide](troubleshooting.md)
+6. **Using PowerShell scripts?** See [Scripts Reference](scripts.md)
 
 ## 🤝 Contributing
 
-Found a bug? Have an idea? See [CONTRIBUTING.md](../CONTRIBUTING.md).
+Found a bug or have an idea for improvement? See the main [GitHub repository](https://github.com/markheydon/avd-occasional) for contribution guidelines.
 
 ## 📄 License
 
-MIT License - See [LICENSE](../LICENSE) for details.
+MIT License – See [LICENSE](../LICENSE) for details.
 
 ---
 
-**Documentation Links**:
-- [Full README](../README.md) - Complete reference.
-- [Deployment Guide](../DEPLOYMENT.md) - Step-by-step instructions.
-- [GitHub Repository](https://github.com/markheydon/avd-occasional).
-
+**Main Repository**: [github.com/markheydon/avd-occasional](https://github.com/markheydon/avd-occasional)  
 **Last Updated**: February 2026  
 **Current Version**: 1.0

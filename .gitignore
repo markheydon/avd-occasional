@@ -26,3 +26,8 @@ Thumbs.db
 # Deployment artifacts
 deployment-output.json
 *.log
+
+# Local Jekyll testing
+Gemfile
+Gemfile.lock
+_site/
