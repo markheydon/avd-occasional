@@ -9,17 +9,29 @@
 // - Boot diagnostics enabled for troubleshooting
 // ===================================
 
+
+@description('Prefix used for naming resources in this session host deployment.')
 param resourcePrefix string
+@description('Number of session host virtual machines to create.')
 param vmCount int
+@description('VM size (SKU) for the session host virtual machines.')
 param vmSku string
+@description('Image reference object specifying the OS image for the session hosts.')
 param vmImageReference object
+@description('Resource ID of the subnet where the session host network interfaces will be deployed.')
 param subnetId string
+@description('Resource ID of the network security group associated with the session host network interfaces.')
 param nsgId string
+@description('Azure region where the session host resources will be deployed.')
 param location string
+@description('Tags to apply to all resources created by this module.')
 param tags object
+@description('Local administrator username for the session host virtual machines.')
 param adminUsername string
+@description('Local administrator password for the session host virtual machines.')
 @secure()
 param adminPassword string
+@description('URI of the storage location containing deployment artifacts such as scripts and configuration.')
 param artifactsLocation string
 
 @description('Host Pool Name')

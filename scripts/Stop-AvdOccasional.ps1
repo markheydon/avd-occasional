@@ -116,7 +116,7 @@ foreach ($vm in $vms) {
         $waited = 0
         $stillAssociated = $true
         while ($waited -lt $maxWait) {
-            $currentPipId = az network nic show --ids $nicId --query "ipConfigurations[0].publicIpAddress.id" -o tsv 2>$null
+            $currentPipId = az network nic show --ids $nicId --query "ipConfigurations[0].publicIPAddress.id" -o tsv 2>$null
             if (-not $currentPipId) {
                 $stillAssociated = $false
                 break

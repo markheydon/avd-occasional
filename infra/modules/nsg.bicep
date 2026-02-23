@@ -4,8 +4,11 @@
 // Blocks all inbound, allows all outbound
 // ===================================
 
+@description('Name of the Network Security Group')
 param nsgName string
+@description('Azure region where the Network Security Group will be deployed')
 param location string
+@description('Tags to apply to the Network Security Group resource')
 param tags object
 
 // ===================================

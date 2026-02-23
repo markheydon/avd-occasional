@@ -8,9 +8,13 @@
 // and subnets are explicitly defined in the VNet creation.
 // ===================================
 
+@description('Name of the virtual network to create.')
 param vnetName string
+@description('Name of the subnet within the virtual network (used for AVD).')
 param subnetName string
+@description('Azure region where the virtual network and subnet will be deployed.')
 param location string
+@description('Resource tags to apply to the virtual network.')
 param tags object
 
 // ===================================

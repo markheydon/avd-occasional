@@ -15,7 +15,6 @@ param(
     [int]$VmCount = 1,
     [string]$AdminUsername = "avdadmin",
     [securestring]$AdminPassword,
-    [switch]$UseHybridBenefit,
     [switch]$WhatIf
 )
 
@@ -127,6 +126,29 @@ Write-Host ""
 if (-not $AdminPassword) {
     Write-Host "Admin password was not provided. You will be prompted to enter it now." -ForegroundColor Yellow
     $AdminPassword = Read-Host -AsSecureString -Prompt "Enter the local administrator password for the session host VMs"
+}
+
+# Ensure the adminPassword parameter is included in the deployment parameters
+if ($AdminPassword) {
+    # Check whether adminPassword is already present in $deployParams
+    $hasAdminPasswordParam = $false
+    if ($deployParams -and $deployParams.Count -gt 1) {
+        for ($i = 0; $i -lt ($deployParams.Count - 1); $i++) {
+            if ($deployParams[$i] -eq '--parameters' -and $deployParams[$i + 1] -like 'adminPassword=*') {
+                $hasAdminPasswordParam = $true
+                break
+            }
+        }
+    }
+
+    # Convert SecureString to plain text for passing to az CLI
+    if (-not $hasAdminPasswordParam) {
+        $adminPasswordPlain = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
+            [Runtime.InteropServices.Marshal]::SecureStringToBSTR($AdminPassword)
+        )
+        # Append the adminPassword parameter for the Bicep template
+        $deployParams += @('--parameters', "adminPassword=$adminPasswordPlain")
+    }
 }
 
 az deployment group create @deployParams

@@ -141,7 +141,7 @@ See [Architecture Overview](architecture.md) for detailed component descriptions
 
 For full prerequisite details, see [Prerequisites Guide](prerequisites.md).
 
-## � Documentation & Resources
+## 📘 Documentation & Resources
 
 ### Getting Started
 

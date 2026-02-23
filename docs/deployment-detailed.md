@@ -148,7 +148,7 @@ Edit `infra/parameters.json` to customize deployment:
     "tags": {
       "value": {
         "project": "avd-occasional",
-        "managedBy": "terraform"
+        "managedBy": "bicep"
       }
     }
   }
