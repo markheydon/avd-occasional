@@ -18,50 +18,39 @@ if (-not $vms) {
     exit 0
 }
 
-# Convert single result to array
 if ($vms -is [string]) {
     $vms = @($vms)
 }
 
-Write-Host "Found $($vms.Count) VM(s) to start:" -ForegroundColor Yellow
-$vms | ForEach-Object { Write-Host "  - $_" }
+Write-Host "Found $($vms.Count) VM(s) to start: $($vms -join ', ')" -ForegroundColor Yellow
 Write-Host ""
 
+# Allocate Public IPs for outbound connectivity before starting VMs
 Write-Host "Allocating Public IPs for outbound connectivity..." -ForegroundColor Cyan
-
 foreach ($vm in $vms) {
-    # Get the NIC associated with the VM
     $nicId = az vm show --resource-group $ResourceGroupName --name $vm --query "networkProfile.networkInterfaces[0].id" -o tsv 2>$null
-    
     if ($nicId) {
         $nicName = ($nicId -split '/')[-1]
-        
-        # Check if Public IP already associated
-        $existingPipId = az network nic show --ids $nicId --query "ipConfigurations[0].publicIpAddress.id" -o tsv 2>$null
-        
+        $existingPipId = az network nic show --ids $nicId --query "ipConfigurations[0].publicIPAddress.id" -o tsv 2>$null
         if (-not $existingPipId) {
-            # Extract the NIC index and suffix from the NIC name (e.g., avd-dev-nic-0-zx4itrg75d2kc)
             if ($nicName -match '(.+)-nic-(\d+)-(.+)') {
                 $prefix = $matches[1]
                 $index = $matches[2]
                 $suffix = $matches[3]
                 $pipName = "$prefix-pip-$index-$suffix"
             } else {
-                # Fallback to simple naming if pattern doesn't match
                 $pipName = "$nicName-pip"
             }
-            
-            # Check if the PIP already exists in the resource group (deleted from NIC but not from RG)
             $existingPip = az network public-ip show `
                 --resource-group $ResourceGroupName `
                 --name $pipName `
                 --query "id" -o tsv 2>$null
-            
+            $pipId = $null
+            $actionMsg = ""
             if ($existingPip) {
-                Write-Host "  Re-associating existing Public IP ($pipName) to $vm..." -ForegroundColor Yellow
                 $pipId = $existingPip
+                $actionMsg = "Re-associating existing Public IP ($pipName) to $vm..."
             } else {
-                Write-Host "  Creating Public IP ($pipName) for $vm..." -ForegroundColor Yellow
                 $pipId = az network public-ip create `
                     --resource-group $ResourceGroupName `
                     --name $pipName `
@@ -69,32 +58,46 @@ foreach ($vm in $vms) {
                     --allocation-method Static `
                     --version IPv4 `
                     --query "publicIp.id" -o tsv 2>$null
+                $actionMsg = "Creating Public IP ($pipName) for $vm..."
             }
-            
+            Write-Host "$actionMsg" -NoNewline
+            $assocResult = $null
             if ($pipId) {
-                # Associate Public IP to NIC
-                az network nic ip-config update `
+                $assocResult = az network nic ip-config update `
                     --resource-group $ResourceGroupName `
                     --nic-name $nicName `
                     --name ipconfig1 `
-                    --public-ip-address $pipId 2>$null | Out-Null
+                    --public-ip-address $pipId 2>&1
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host " Success" -ForegroundColor Green
+                } else {
+                    Write-Host " Failed" -ForegroundColor Red
+                    Write-Host "    $assocResult" -ForegroundColor Red
+                }
+            } else {
+                Write-Host " Failed (no Public IP ID)" -ForegroundColor Red
             }
-        }
-        else {
+        } else {
             $existingPipName = ($existingPipId -split '/')[-1]
-            Write-Host "  Public IP ($existingPipName) already associated with $vm" -ForegroundColor Gray
+            Write-Host "Public IP ($existingPipName) already associated with $vm" -ForegroundColor Gray
         }
     }
 }
-
 Write-Host ""
 Write-Host "Public IPs allocated." -ForegroundColor Green
 Write-Host ""
 
 # Start each VM
+
 foreach ($vm in $vms) {
-    Write-Host "Starting $vm..." -ForegroundColor Yellow
-    az vm start --resource-group $ResourceGroupName --name $vm --no-wait
+    Write-Host "Starting $vm..." -NoNewline
+    $startOutput = az vm start --resource-group $ResourceGroupName --name $vm --no-wait 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host " Success" -ForegroundColor Green
+    } else {
+        Write-Host " Failed" -ForegroundColor Red
+        Write-Host "    $startOutput" -ForegroundColor Red
+    }
 }
 
 Write-Host "VM startup operations initiated." -ForegroundColor Green
@@ -109,6 +112,6 @@ if ($WaitForStartup) {
     Write-Host "All VMs started successfully!" -ForegroundColor Green
 }
 else {
-    Write-Host "To check status:" -ForegroundColor Cyan
-    Write-Host "  az vm list --resource-group $ResourceGroupName --query '[].{Name:name, PowerState:powerState}' -o table"
+    Write-Host "To check VM status (including power state):" -ForegroundColor Cyan
+    Write-Host "  az vm list --resource-group $ResourceGroupName --show-details --query '[].{Name:name, PowerState:powerState}' -o table"
 }
