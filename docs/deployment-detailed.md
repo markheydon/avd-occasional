@@ -318,7 +318,7 @@ az role assignment create `
   --assignee $userId `
   --scope $appGroupId
 
-# Role 2: Virtual Machine User Login
+# Role 2: Virtual Machine User Login (or Administrator Login for dev/admin access)
 $vmIds = @(az vm list --resource-group avd-occasional-rg --query '[].id' -o tsv)
 foreach ($vmId in $vmIds) {
     az role assignment create `
@@ -327,6 +327,8 @@ foreach ($vmId in $vmIds) {
       --scope $vmId
 }
 ```
+
+For local administrator rights while signed in with Entra ID, use **Virtual Machine Administrator Login** instead of User Login. See [Quick Start: Role 2, Option B](quickstart.md#option-b-virtual-machine-administrator-login-developers).
 
 ### 10. Test Connection
 
@@ -357,7 +359,7 @@ RDP Shortpath requires additional setup (not recommended for occasional use). Se
 $adminPassword = Read-Host "Enter admin password" -AsSecureString
 .\scripts\Deploy-AvdOccasional.ps1 -AdminPassword $adminPassword
 
-# Assign roles to new VMs
+# Assign roles to new VMs (use Virtual Machine Administrator Login for admin access)
 $userId = (az ad signed-in-user show --query id -o tsv)
 $vmIds = @(az vm list --resource-group avd-occasional-rg --query '[].id' -o tsv)
 foreach ($vmId in $vmIds) {
@@ -367,6 +369,8 @@ foreach ($vmId in $vmIds) {
       --scope $vmId
 }
 ```
+
+See [Quick Start: Role 2](quickstart.md#role-2-vm-sign-in-session-host-vms) if you need administrator rights on new VMs.
 
 **Cost impact:** Each VM adds ~£100–120/month active, ~£0 deallocated.
 

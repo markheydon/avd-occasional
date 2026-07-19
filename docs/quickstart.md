@@ -42,6 +42,8 @@ This creates all Azure Virtual Desktop resources: virtual network, host pool, se
 
 **⚠️ Users cannot connect without these role assignments.**
 
+Role assignments are manual post-deploy steps today. Automating them via Bicep is tracked in [issue #3](https://github.com/markheydon/avd-occasional/issues/3).
+
 ### Role 1: Desktop Virtualization User (Application Group)
 
 ```powershell
@@ -57,7 +59,13 @@ az role assignment create `
   --scope $appGroupId
 ```
 
-### Role 2: Virtual Machine User Login (Session Host VMs)
+### Role 2: VM sign-in (Session Host VMs)
+
+Assign **one** of the following roles on each session host VM. You do not need both.
+
+#### Option A: Virtual Machine User Login (default)
+
+Standard user sign-in. Use this for occasional desktop use where you do not need to install software or change system settings.
 
 ```powershell
 $userId = (az ad signed-in-user show --query id -o tsv)
@@ -71,7 +79,33 @@ foreach ($vmId in $vmIds) {
 }
 ```
 
-**Allow 5–10 minutes for roles to propagate before connecting.**
+#### Option B: Virtual Machine Administrator Login (developers)
+
+Sign in with your Entra ID account **and** local administrator rights. Use this if you need to install development tools, change system settings, or perform other admin tasks while signed in with your normal Entra identity.
+
+```powershell
+$userId = (az ad signed-in-user show --query id -o tsv)
+$vmIds = @(az vm list --resource-group avd-occasional-rg --query '[].id' -o tsv)
+
+foreach ($vmId in $vmIds) {
+    az role assignment create `
+      --role "Virtual Machine Administrator Login" `
+      --assignee $userId `
+      --scope $vmId
+}
+```
+
+To assign admin rights to a different user, replace the first line with:
+
+```powershell
+$userId = (az ad user show --id "you@yourtenant.onmicrosoft.com" --query id -o tsv)
+```
+
+**Security note:** This role grants full local administrator access on the VM. Use it for personal development desktops; avoid it for shared or production-style hosts.
+
+**Alternative:** The `avdadmin` local account created during deployment also has administrator rights, but you must sign in with that separate account and password rather than your Entra ID credentials.
+
+**Allow 5–10 minutes for roles to propagate before connecting.** If you are already signed in and change the VM login role, sign out and reconnect for the new privileges to take effect.
 
 ## 4. Connect to Your Desktop
 

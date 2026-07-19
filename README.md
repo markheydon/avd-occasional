@@ -88,7 +88,12 @@ az vm list-ip-addresses --resource-group avd-occasional-rg
 
 ### 7. Assign Required Roles
 
-Assign the required roles to your Entra ID user for VM login and AVD access:
+Assign the required roles to your Entra ID user for VM login and AVD access. You need **Desktop Virtualization User** on the application group, plus **one** VM sign-in role on each session host:
+
+- **Virtual Machine User Login** – Standard user (default).
+- **Virtual Machine Administrator Login** – Local admin while signed in with Entra ID (for developers).
+
+See [Quick Start: Step 3](docs/quickstart.md#3-assign-role-permissions-required) for full commands, including the optional administrator role.
 
 ```powershell
 # Get current user
@@ -103,7 +108,7 @@ az role assignment create `
   --assignee $userId `
   --scope $appGroupId
 
-# Virtual Machine User Login role assignment
+# Virtual Machine User Login role assignment (use Administrator Login instead for dev/admin access)
 $vmIds = @(az vm list --resource-group avd-occasional-rg --query '[].id' -o tsv)
 foreach ($vmId in $vmIds) {
     az role assignment create `
@@ -112,6 +117,8 @@ foreach ($vmId in $vmIds) {
       --scope $vmId
 }
 ```
+
+The `avdadmin` password from deployment is for the separate local break-glass account, not for elevating your Entra ID user.
 
 ---
 

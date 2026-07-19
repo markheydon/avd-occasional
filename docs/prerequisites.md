@@ -118,16 +118,24 @@ This deployment uses **Entra ID-joined VMs**, which means:
 
 After deployment, users need **two separate role assignments** to connect:
 
-1. **Desktop Virtualization User** – Access the AVD workspace and application group
-2. **Virtual Machine User Login** – Log into the Entra ID-joined session host VMs
+1. **Desktop Virtualization User** – Access the AVD workspace and application group.
+2. **VM sign-in role** – Log into the Entra ID-joined session host VMs. Assign **one** of:
+   - **Virtual Machine User Login** – Standard user sign-in (default, least privilege).
+   - **Virtual Machine Administrator Login** – Sign in with local administrator rights (for developers who need to install software or change system settings).
 
-Without both roles, users will receive:
+You do not need both VM sign-in roles. Choose User Login for occasional use, or Administrator Login if you need admin rights while signed in with your Entra ID account.
+
+Without the AVD role and a VM sign-in role, users will receive:
 - "Workspace not available" in Windows App, or
-- "Your account is configured to prevent you from using this device" when trying to log in
+- "Your account is configured to prevent you from using this device" when trying to log in.
+
+The `avdadmin` local account created during deployment is separate from Entra ID sign-in. It provides a break-glass administrator account but requires signing in with that username and password, not your Entra credentials.
 
 ### Assigning Roles
 
 See [Quick Start: Step 3](quickstart.md#3-assign-role-permissions-required) for automated commands, or follow the manual steps below.
+
+Role assignments are manual post-deploy steps today. Automating them via Bicep is tracked in [issue #3](https://github.com/markheydon/avd-occasional/issues/3).
 
 #### Manual Assignment via Azure Portal
 
@@ -147,11 +155,11 @@ See [Quick Start: Step 3](quickstart.md#3-assign-role-permissions-required) for 
 12. Click your account to select it
 13. Click **Select** > **Next** > **Review + assign**
 
-**For Virtual Machine User Login role:**
+**For VM sign-in role** (choose one per VM):
 
 1. Repeat the steps above, but:
    - Find each **Session Host VM** (name: `avd-dev-vm-0-*`, etc.)
-   - Select role **Virtual Machine User Login**
+   - Select role **Virtual Machine User Login** (standard user) or **Virtual Machine Administrator Login** (local admin)
    - Assign to the same user account
 
 **Allow 5–10 minutes for role propagation** before attempting to connect.
@@ -173,7 +181,7 @@ az role assignment create `
   --scope $appGroupId
 ```
 
-**Virtual Machine User Login role** (for all VMs):
+**Virtual Machine User Login role** (standard user, for all VMs):
 
 ```powershell
 $userId = (az ad signed-in-user show --query id -o tsv)
@@ -187,6 +195,23 @@ foreach ($vmId in $vmIds) {
       --scope $vmId
 }
 ```
+
+**Virtual Machine Administrator Login role** (local admin, for all VMs):
+
+```powershell
+$userId = (az ad signed-in-user show --query id -o tsv)
+
+$vmIds = @(az vm list --resource-group avd-occasional-rg --query '[].id' -o tsv)
+
+foreach ($vmId in $vmIds) {
+    az role assignment create `
+      --role "Virtual Machine Administrator Login" `
+      --assignee $userId `
+      --scope $vmId
+}
+```
+
+See [Quick Start: Role 2](quickstart.md#role-2-vm-sign-in-session-host-vms) for guidance on choosing between these roles.
 
 ### Assigning Roles to Multiple Users
 
