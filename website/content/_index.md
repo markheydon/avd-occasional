@@ -55,8 +55,9 @@ az login
 
 ## 💰 Cost Profile
 
-**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publicly in July 2026
-and are subject to change by Microsoft at any time. You should use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
+{{< callout type="important" >}}
+Costs are estimates, in GBP, based on pricing information available publicly in July 2026 and are subject to change by Microsoft at any time. Use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
+{{< /callout >}}
 
 | State | Monthly Cost | Notes |
 |-------|-------------|-------|
@@ -85,24 +86,32 @@ See the [Architecture Overview](/docs/architecture/#high-level-architecture) for
 
 ## 🎯 Use Cases
 
-✅ **Remote work from alternate location** – Coffee shop, co-working, travel.
-✅ **Temporary compute needs** – Project work, testing, demos.
-✅ **Cost-sensitive scenarios** – Deallocate between sessions.
-✅ **Personal productivity** – Persistent desktop, cloud-native identity.
+{{< callout type="info" >}}
+**Suitable for**
 
-❌ **Not for:** Pooled multi-user scenarios.
-❌ **Not for:** Always-on production workloads.
+- **Remote work from alternate location** – Coffee shop, co-working, travel.
+- **Temporary compute needs** – Project work, testing, demos.
+- **Cost-sensitive scenarios** – Deallocate between sessions.
+- **Personal productivity** – Persistent desktop, cloud-native identity.
+{{< /callout >}}
+
+{{< callout type="warning" >}}
+**Not suitable for**
+
+- Pooled multi-user scenarios.
+- Always-on production workloads.
+{{< /callout >}}
 
 ## 🔧 Key Features
 
-- ✅ **Bicep Infrastructure as Code** – Reproducible, auditable, version-controlled.
-- ✅ **Parameterised configuration** – Switch workload size (light/moderate) in one parameter.
-- ✅ **Personal desktop** – Single user, persistent configuration.
-- ✅ **Entra ID authentication** – Cloud-native identity, supports passwordless auth.
-- ✅ **Deallocate pattern** – Stop VMs to save costs, resume in 2–3 minutes.
-- ✅ **Automated lifecycle scripts** – Deploy, start, deallocate, cleanup.
-- ✅ **Minimal security** – Reverse connections, NSG included, no RDP ports.
-- ✅ **UK-friendly defaults** – Region: `ukwest`, pricing in GBP _(Regionalising of VMs not yet available see #2)_.
+- **Bicep Infrastructure as Code** – Reproducible, auditable, version-controlled.
+- **Parameterised configuration** – Switch workload size (light/moderate) in one parameter.
+- **Personal desktop** – Single user, persistent configuration.
+- **Entra ID authentication** – Cloud-native identity, supports passwordless auth.
+- **Deallocate pattern** – Stop VMs to save costs, resume in 2–3 minutes.
+- **Automated lifecycle scripts** – Deploy, start, deallocate, cleanup.
+- **Minimal security** – Reverse connections, NSG included, no RDP ports.
+- **UK-friendly defaults** – Region: `ukwest`, pricing in GBP _(Regionalising of VMs not yet available see #2)_.
 
 ## 📋 Prerequisites at a Glance
 
