@@ -1,17 +1,19 @@
 ---
-layout: default
 title: Detailed Deployment Guide
+weight: 40
 ---
 
-# Detailed Deployment Guide
-
-This guide provides comprehensive deployment instructions, architectural context, and advanced configuration options. For quick-start steps, see the [Quick Start Guide](quickstart.md).
+This guide provides comprehensive deployment instructions, architectural context, and advanced configuration options. For quick-start steps, see the [Quick Start Guide](/docs/quickstart/).
 
 ## Important Prerequisites
 
-⚠️ **This template deploys Entra ID-Joined session hosts.** VMs authenticate via cloud-based Entra ID (no on-premises AD required). See [Prerequisites Guide: Entra ID Authentication](prerequisites.md#entra-id-authentication) for details.
+{{< callout type="important" >}}
+This template deploys Entra ID-joined session hosts. VMs authenticate via cloud-based Entra ID (no on-premises AD required). See [Prerequisites Guide: Entra ID Authentication](/docs/prerequisites/#entra-id-authentication) for details.
+{{< /callout >}}
 
-⚠️ **Role assignments are NOT automatic.** After deployment, users must be assigned two RBAC roles. See [Quick Start: Step 3](quickstart.md#3-assign-role-permissions-required) for instructions.
+{{< callout type="warning" >}}
+Role assignments are **not** automatic. After deployment, users must be assigned two RBAC roles. See [Quick Start: Step 3](/docs/quickstart/#3-assign-role-permissions-required) for instructions.
+{{< /callout >}}
 
 ### Prerequisites Checklist
 
@@ -22,7 +24,7 @@ This guide provides comprehensive deployment instructions, architectural context
 - [ ] Entra ID tenant access.
 - [ ] Strong admin password for session host VMs.
 
-For detailed setup, see [Prerequisites Guide](prerequisites.md).
+For detailed setup, see [Prerequisites Guide](/docs/prerequisites/).
 
 ---
 
@@ -60,6 +62,22 @@ The deployment uses two extensions deployed in sequence on each VM:
 - Configures the VM to join the host pool with Entra ID authentication enabled.
 
 **Benefit:** Clean separation of concerns—Entra ID authentication is configured first, then AVD host pool registration follows. Deployment is reliable and works correctly on redeployment.
+
+```mermaid
+sequenceDiagram
+    participant VM as Session Host VM
+    participant AAD as AADLoginForWindows
+    participant DSC as DSC Extension
+    participant HP as Host Pool
+    participant Storage as Artifact storage
+
+    VM->>AAD: Install extension
+    AAD-->>VM: Entra ID auth enabled
+    VM->>DSC: Install extension (after AAD)
+    DSC->>Storage: Download gallery artifact
+    DSC->>HP: Register with token
+    HP-->>VM: Session host Available
+```
 
 ### AVD DSC Artifact URL
 
@@ -115,11 +133,14 @@ Starting March 31, 2026, Azure requires **explicit outbound connectivity methods
 - **IP Address Changes**: Public IPs get new addresses each start cycle (acceptable and expected for outbound-only connectivity).
 
 **Why This Approach:**
-- ✅ **Compliant** – Meets Azure's explicit outbound requirement.
-- ✅ **Cost-optimized** – £0/month when VMs stopped (vs ~£2–3/month if kept).
-- ✅ **Secure** – NSG blocks ALL inbound traffic; IPs are outbound-only.
-- ✅ **Automated** – Start/Stop scripts handle entire lifecycle.
-- ✅ **Fully functional** – Provides internet access for updates, DSC downloads, browsing.
+
+{{< callout type="info" >}}
+- **Compliant** – Meets Azure's explicit outbound requirement.
+- **Cost-optimised** – £0/month when VMs stopped (vs ~£2–3/month if kept).
+- **Secure** – NSG blocks ALL inbound traffic; IPs are outbound-only.
+- **Automated** – Start/Stop scripts handle entire lifecycle.
+- **Fully functional** – Provides internet access for updates, DSC downloads, browsing.
+{{< /callout >}}
 
 ---
 
@@ -183,8 +204,9 @@ Edit `infra/parameters.json` to customize deployment:
 
 **Common Customisations:**
 
-**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publicly in July 2026
-and are subject to change by Microsoft at any time. You should use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
+{{< callout type="important" >}}
+Costs are estimates, in GBP, based on pricing information available publicly in July 2026 and are subject to change by Microsoft at any time. Use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
+{{< /callout >}}
 
 | Parameter | Options | Default | Cost Impact |
 |-----------|---------|---------|------------|
@@ -299,9 +321,11 @@ az deployment group show --resource-group avd-occasional-rg `
 
 ### 9. Configure User Access (Required)
 
-**⚠️ CRITICAL:** Users cannot connect without these role assignments. Allow 5–10 minutes for propagation after assignment.
+{{< callout type="warning" >}}
+Users cannot connect without these role assignments. Allow 5–10 minutes for propagation after assignment.
+{{< /callout >}}
 
-Full instructions: [Quick Start: Step 3](quickstart.md#3-assign-role-permissions-required) or [Prerequisites: Role Assignment Requirements](prerequisites.md#role-assignment-requirements).
+Full instructions: [Quick Start: Step 3](/docs/quickstart/#3-assign-role-permissions-required) or [Prerequisites: Role Assignment Requirements](/docs/prerequisites/#role-assignment-requirements).
 
 **Quick scripts:**
 
@@ -328,7 +352,7 @@ foreach ($vmId in $vmIds) {
 }
 ```
 
-For local administrator rights while signed in with Entra ID, use **Virtual Machine Administrator Login** instead of User Login. See [Quick Start: Role 2, Option B](quickstart.md#option-b-virtual-machine-administrator-login-developers).
+For local administrator rights while signed in with Entra ID, use **Virtual Machine Administrator Login** instead of User Login. See [Quick Start: Role 2, Option B](/docs/quickstart/#option-b-virtual-machine-administrator-login-developers).
 
 ### 10. Test Connection
 
@@ -370,7 +394,7 @@ foreach ($vmId in $vmIds) {
 }
 ```
 
-See [Quick Start: Role 2](quickstart.md#role-2-vm-sign-in-session-host-vms) if you need administrator rights on new VMs.
+See [Quick Start: Role 2](/docs/quickstart/#role-2-vm-sign-in-session-host-vms) if you need administrator rights on new VMs.
 
 **Cost impact:** Each VM adds ~£100–120/month active, ~£0 deallocated.
 
@@ -447,7 +471,7 @@ az deployment group show --resource-group avd-occasional-rg --name main -o json 
 
 ### Common Errors
 
-See [Troubleshooting Guide: Deployment Issues](troubleshooting.md#deployment-issues) for:
+See [Troubleshooting Guide: Deployment Issues](/docs/troubleshooting/#deployment-issues) for:
 - "Subscription does not have quota"
 - "InvalidTemplateDeployment"
 - "User does not have permissions"
@@ -537,11 +561,11 @@ $adminPassword = Read-Host "Enter admin password" -AsSecureString
 
 ## Related Documentation
 
-- [Quick Start](quickstart.md) – Get running in 5 minutes
-- [Prerequisites](prerequisites.md) – Tools and environment setup
-- [Architecture Overview](architecture.md) – How components interact
-- [Troubleshooting](troubleshooting.md) – Common issues and solutions
-- [Scripts Reference](scripts.md) – PowerShell commands explained
+- [Quick Start](/docs/quickstart/) – Get running in 5 minutes
+- [Prerequisites](/docs/prerequisites/) – Tools and environment setup
+- [Architecture Overview](/docs/architecture/) – How components interact
+- [Troubleshooting](/docs/troubleshooting/) – Common issues and solutions
+- [Scripts Reference](/docs/scripts/) – PowerShell commands explained
 
 ---
 

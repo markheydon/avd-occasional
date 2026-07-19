@@ -10,7 +10,7 @@ Guidelines for coding agents working in this repository.
 |-----------|---------|
 | `infra/` | Bicep templates and modules |
 | `scripts/` | PowerShell deployment and management scripts |
-| `docs/` | User-facing documentation (Jekyll / GitHub Pages) |
+| `website/` | User-facing documentation site (Hugo / GitHub Pages) |
 
 ## Bicep conventions
 
@@ -23,7 +23,7 @@ Guidelines for coding agents working in this repository.
 - Reference existing resources with the `existing` keyword when needed.
 - Avoid hardcoding values; use parameters or variables.
 - Ensure all Bicep files pass `az bicep lint` and `az bicep build` without errors or warnings.
-- Update `README.md` and `docs/` when deployment instructions or architecture change.
+- Update `README.md` and `website/content/` when deployment instructions or architecture change.
 - Document new modules with usage examples.
 
 ## PowerShell conventions
@@ -78,7 +78,7 @@ Use these skills for specialised workflows:
 | Skill | When to use |
 |-------|-------------|
 | `bicep-implement` | Writing or modifying Bicep in `infra/`, using Azure Verified Modules, or infrastructure-as-code changes |
-| `technical-writing` | Creating or editing `docs/`, `README.md`, `CHANGELOG.md`, or other user-facing technical content |
+| `technical-writing` | Creating or editing `website/content/`, `README.md`, `CHANGELOG.md`, or other user-facing technical content |
 
 Skills live in `.agents/skills/<skill-name>/SKILL.md`.
 
