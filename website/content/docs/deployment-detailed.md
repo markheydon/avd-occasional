@@ -59,6 +59,22 @@ The deployment uses two extensions deployed in sequence on each VM:
 
 **Benefit:** Clean separation of concerns—Entra ID authentication is configured first, then AVD host pool registration follows. Deployment is reliable and works correctly on redeployment.
 
+```mermaid
+sequenceDiagram
+    participant VM as Session Host VM
+    participant AAD as AADLoginForWindows
+    participant DSC as DSC Extension
+    participant HP as Host Pool
+    participant Storage as Artifact storage
+
+    VM->>AAD: Install extension
+    AAD-->>VM: Entra ID auth enabled
+    VM->>DSC: Install extension (after AAD)
+    DSC->>Storage: Download gallery artifact
+    DSC->>HP: Register with token
+    HP-->>VM: Session host Available
+```
+
 ### AVD DSC Artifact URL
 
 The `artifactsLocation` parameter in `infra/parameters.json` points to a pinned Microsoft gallery artifact ZIP used by the DSC extension to register session hosts with the host pool:

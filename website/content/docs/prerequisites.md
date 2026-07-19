@@ -5,6 +5,22 @@ weight: 10
 
 Before deploying Azure Virtual Desktop, ensure your environment is properly configured.
 
+## Prerequisites flow
+
+```mermaid
+flowchart LR
+    Tools["Local tools<br/>CLI, Bicep, PowerShell, Git"]
+    Azure["Azure subscription<br/>Contributor role"]
+    Entra["Entra ID tenant"]
+    Roles["RBAC roles<br/>(post-deploy)"]
+    Ready["Ready to deploy"]
+
+    Tools --> Azure
+    Azure --> Entra
+    Entra --> Roles
+    Roles --> Ready
+```
+
 ## System Requirements
 
 ### Locally Installed Tools

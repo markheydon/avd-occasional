@@ -18,6 +18,26 @@ Before starting, ensure you have:
 
 For detailed prerequisites, see [Prerequisites Guide](/docs/prerequisites/).
 
+## Deployment flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant CLI as Azure CLI
+    participant Bicep
+    participant Azure
+    participant App as Windows App
+
+    User->>CLI: az login
+    User->>Bicep: Deploy-AvdOccasional.ps1
+    Bicep->>Azure: Deploy infrastructure
+    Azure-->>User: Resources created (~15-20 min)
+    User->>Azure: Assign RBAC roles
+    Note over User,Azure: Wait 5-10 min for propagation
+    User->>App: Sign in with Entra ID
+    App->>Azure: Connect to desktop
+```
+
 ## 1. Clone and Authenticate
 
 ```powershell

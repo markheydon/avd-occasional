@@ -5,6 +5,34 @@ weight: 60
 
 Solutions for common issues encountered during deployment and operation.
 
+## Connection troubleshooting
+
+```mermaid
+flowchart TD
+    A["Cannot connect to desktop"] --> B{"Workspace visible<br/>in Windows App?"}
+    B -->|No| C["Assign Desktop<br/>Virtualization User role"]
+    B -->|Yes| D{"Error on launch?"}
+    D -->|Account prevented| E["Assign VM User Login<br/>or Administrator Login role"]
+    D -->|Timeout| F{"VM running?"}
+    F -->|No| G["Start-AvdOccasional.ps1"]
+    F -->|Yes| H["Run Test-AvdSessionHost.ps1"]
+    C --> I["Wait 5-10 min,<br/>sign out and back in"]
+    E --> I
+```
+
+## Deployment troubleshooting
+
+```mermaid
+flowchart TD
+    A["Deployment failed"] --> B{"Quota error?"}
+    B -->|Yes| C["Try different region<br/>or request quota increase"]
+    B -->|No| D{"Permission error?"}
+    D -->|Yes| E["Verify Contributor role<br/>on subscription"]
+    D -->|No| F{"Validation error?"}
+    F -->|Yes| G["az bicep build<br/>+ validate parameters.json"]
+    F -->|No| H["Run Deploy with -Verbose<br/>and check activity log"]
+```
+
 ## Deployment Issues
 
 ### Error: "The subscription does not have quota"
