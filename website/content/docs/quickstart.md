@@ -1,9 +1,7 @@
 ---
-layout: default
 title: Quick Start
+weight: 20
 ---
-
-# Quick Start
 
 Get your Azure Virtual Desktop environment running in approximately 5 minutes.
 
@@ -18,7 +16,7 @@ Before starting, ensure you have:
 - ✅ Entra ID user account.
 - ✅ Strong admin password for session hosts.
 
-For detailed prerequisites, see [Prerequisites Guide](prerequisites.md).
+For detailed prerequisites, see [Prerequisites Guide](/docs/prerequisites/).
 
 ## 1. Clone and Authenticate
 
@@ -136,14 +134,14 @@ Restart whenever you need the desktop:
 
 ### Explore Further
 
-- [Architecture Overview](architecture.md) – Understand the infrastructure.
-- [Full Deployment Guide](deployment-detailed.md) – Detailed walkthrough and customisation.
-- [Troubleshooting](troubleshooting.md) – Common issues and solutions.
-- [PowerShell Scripts Reference](scripts.md) – Available commands and options.
+- [Architecture Overview](/docs/architecture/) – Understand the infrastructure.
+- [Full Deployment Guide](/docs/deployment-detailed/) – Detailed walkthrough and customisation.
+- [Troubleshooting](/docs/troubleshooting/) – Common issues and solutions.
+- [PowerShell Scripts Reference](/docs/scripts/) – Available commands and options.
 
 ### Issues?
 
-See [Troubleshooting Guide](troubleshooting.md) for common problems and solutions.
+See [Troubleshooting Guide](/docs/troubleshooting/) for common problems and solutions.
 
 ---
 

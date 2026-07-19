@@ -1,9 +1,7 @@
 ---
-layout: default
 title: PowerShell Scripts Reference
+weight: 50
 ---
-
-# PowerShell Scripts Reference
 
 This guide documents the PowerShell scripts included in the `scripts/` folder and how to use them for managing your Azure Virtual Desktop deployment.
 
@@ -112,7 +110,7 @@ $adminPassword = Read-Host "Enter password" -AsSecureString
 
 ### Troubleshooting
 
-See [Troubleshooting Guide: Deployment Issues](troubleshooting.md#deployment-issues).
+See [Troubleshooting Guide: Deployment Issues](/docs/troubleshooting/#deployment-issues).
 
 ---
 
@@ -194,7 +192,7 @@ VM Status:
 
 ### Troubleshooting
 
-See [Troubleshooting Guide: Connection Issues](troubleshooting.md#connection-issues).
+See [Troubleshooting Guide: Connection Issues](/docs/troubleshooting/#connection-issues).
 
 ---
 
@@ -499,7 +497,7 @@ Checking Entra ID join status...
 
 ### Troubleshooting with Test Results
 
-See [Troubleshooting Guide: Diagnosis Steps](troubleshooting.md#diagnosis-with-test-avdsessionhost) for interpreting specific diagnostic results.
+See [Troubleshooting Guide: Diagnosis Steps](/docs/troubleshooting/#diagnosis-with-test-avdsessionhost) for interpreting specific diagnostic results.
 
 ---
 
@@ -562,14 +560,14 @@ For enterprise deployments, consider [Azure Automation Runbooks](https://learn.m
 
 ## Troubleshooting Scripts
 
-See [Troubleshooting Guide: Script Issues](troubleshooting.md#script--automation-issues).
+See [Troubleshooting Guide: Script Issues](/docs/troubleshooting/#script--automation-issues).
 
 ---
 
 **Related Documentation:**
-- [Quick Start](quickstart.md)
-- [Deployment Details](deployment-detailed.md)
-- [Architecture Overview](architecture.md)
+- [Quick Start](/docs/quickstart/)
+- [Deployment Details](/docs/deployment-detailed/)
+- [Architecture Overview](/docs/architecture/)
 
 ---
 

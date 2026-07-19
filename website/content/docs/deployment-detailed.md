@@ -1,17 +1,15 @@
 ---
-layout: default
 title: Detailed Deployment Guide
+weight: 40
 ---
 
-# Detailed Deployment Guide
-
-This guide provides comprehensive deployment instructions, architectural context, and advanced configuration options. For quick-start steps, see the [Quick Start Guide](quickstart.md).
+This guide provides comprehensive deployment instructions, architectural context, and advanced configuration options. For quick-start steps, see the [Quick Start Guide](/docs/quickstart/).
 
 ## Important Prerequisites
 
-⚠️ **This template deploys Entra ID-Joined session hosts.** VMs authenticate via cloud-based Entra ID (no on-premises AD required). See [Prerequisites Guide: Entra ID Authentication](prerequisites.md#entra-id-authentication) for details.
+⚠️ **This template deploys Entra ID-Joined session hosts.** VMs authenticate via cloud-based Entra ID (no on-premises AD required). See [Prerequisites Guide: Entra ID Authentication](/docs/prerequisites/#entra-id-authentication) for details.
 
-⚠️ **Role assignments are NOT automatic.** After deployment, users must be assigned two RBAC roles. See [Quick Start: Step 3](quickstart.md#3-assign-role-permissions-required) for instructions.
+⚠️ **Role assignments are NOT automatic.** After deployment, users must be assigned two RBAC roles. See [Quick Start: Step 3](/docs/quickstart/#3-assign-role-permissions-required) for instructions.
 
 ### Prerequisites Checklist
 
@@ -22,7 +20,7 @@ This guide provides comprehensive deployment instructions, architectural context
 - [ ] Entra ID tenant access.
 - [ ] Strong admin password for session host VMs.
 
-For detailed setup, see [Prerequisites Guide](prerequisites.md).
+For detailed setup, see [Prerequisites Guide](/docs/prerequisites/).
 
 ---
 
@@ -301,7 +299,7 @@ az deployment group show --resource-group avd-occasional-rg `
 
 **⚠️ CRITICAL:** Users cannot connect without these role assignments. Allow 5–10 minutes for propagation after assignment.
 
-Full instructions: [Quick Start: Step 3](quickstart.md#3-assign-role-permissions-required) or [Prerequisites: Role Assignment Requirements](prerequisites.md#role-assignment-requirements).
+Full instructions: [Quick Start: Step 3](/docs/quickstart/#3-assign-role-permissions-required) or [Prerequisites: Role Assignment Requirements](/docs/prerequisites/#role-assignment-requirements).
 
 **Quick scripts:**
 
@@ -328,7 +326,7 @@ foreach ($vmId in $vmIds) {
 }
 ```
 
-For local administrator rights while signed in with Entra ID, use **Virtual Machine Administrator Login** instead of User Login. See [Quick Start: Role 2, Option B](quickstart.md#option-b-virtual-machine-administrator-login-developers).
+For local administrator rights while signed in with Entra ID, use **Virtual Machine Administrator Login** instead of User Login. See [Quick Start: Role 2, Option B](/docs/quickstart/#option-b-virtual-machine-administrator-login-developers).
 
 ### 10. Test Connection
 
@@ -370,7 +368,7 @@ foreach ($vmId in $vmIds) {
 }
 ```
 
-See [Quick Start: Role 2](quickstart.md#role-2-vm-sign-in-session-host-vms) if you need administrator rights on new VMs.
+See [Quick Start: Role 2](/docs/quickstart/#role-2-vm-sign-in-session-host-vms) if you need administrator rights on new VMs.
 
 **Cost impact:** Each VM adds ~£100–120/month active, ~£0 deallocated.
 
@@ -447,7 +445,7 @@ az deployment group show --resource-group avd-occasional-rg --name main -o json 
 
 ### Common Errors
 
-See [Troubleshooting Guide: Deployment Issues](troubleshooting.md#deployment-issues) for:
+See [Troubleshooting Guide: Deployment Issues](/docs/troubleshooting/#deployment-issues) for:
 - "Subscription does not have quota"
 - "InvalidTemplateDeployment"
 - "User does not have permissions"
@@ -537,11 +535,11 @@ $adminPassword = Read-Host "Enter admin password" -AsSecureString
 
 ## Related Documentation
 
-- [Quick Start](quickstart.md) – Get running in 5 minutes
-- [Prerequisites](prerequisites.md) – Tools and environment setup
-- [Architecture Overview](architecture.md) – How components interact
-- [Troubleshooting](troubleshooting.md) – Common issues and solutions
-- [Scripts Reference](scripts.md) – PowerShell commands explained
+- [Quick Start](/docs/quickstart/) – Get running in 5 minutes
+- [Prerequisites](/docs/prerequisites/) – Tools and environment setup
+- [Architecture Overview](/docs/architecture/) – How components interact
+- [Troubleshooting](/docs/troubleshooting/) – Common issues and solutions
+- [Scripts Reference](/docs/scripts/) – PowerShell commands explained
 
 ---
 

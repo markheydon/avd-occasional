@@ -1,9 +1,6 @@
 ---
-layout: default
-title: Azure Virtual Desktop - Occasional Use
+title: Azure Virtual Desktop for Occasional Use
 ---
-
-# Azure Virtual Desktop for Occasional Use
 
 [![Bicep Lint](https://github.com/markheydon/avd-occasional/actions/workflows/bicep-lint.yml/badge.svg)](https://github.com/markheydon/avd-occasional/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -43,18 +40,18 @@ az login
 .\scripts\Start-AvdOccasional.ps1
 ```
 
-**Full instructions**: [Quick Start Guide](quickstart.md)
+**Full instructions**: [Quick Start Guide](/docs/quickstart/)
 
 ## 📚 Documentation
 
 | Document | Purpose |
 |----------|---------|
-| **[Quick Start](quickstart.md)** | Get up and running in ~25 minutes (includes 5–10 min role propagation). |
-| **[Prerequisites](prerequisites.md)** | Tools, Azure setup, role assignments, and security requirements. |
-| **[Architecture Overview](architecture.md)** | How components work together, cost drivers, security model. |
-| **[Detailed Deployment](deployment-detailed.md)** | Step-by-step walkthrough, customisation, and advanced options. |
-| **[Troubleshooting](troubleshooting.md)** | Common issues and solutions. |
-| **[Scripts Reference](scripts.md)** | PowerShell commands: Deploy, Start, Stop, Remove. |
+| **[Quick Start](/docs/quickstart/)** | Get up and running in ~25 minutes (includes 5–10 min role propagation). |
+| **[Prerequisites](/docs/prerequisites/)** | Tools, Azure setup, role assignments, and security requirements. |
+| **[Architecture Overview](/docs/architecture/)** | How components work together, cost drivers, security model. |
+| **[Detailed Deployment](/docs/deployment-detailed/)** | Step-by-step walkthrough, customisation, and advanced options. |
+| **[Troubleshooting](/docs/troubleshooting/)** | Common issues and solutions. |
+| **[Scripts Reference](/docs/scripts/)** | PowerShell commands: Deploy, Start, Stop, Remove. |
 
 ## 💰 Cost Profile
 
@@ -73,7 +70,7 @@ and are subject to change by Microsoft at any time. You should use the official 
 - Public IP: £2–3/month (active) → £0 (deallocated & deleted).
 - OS Disk: £2–3/month (always charged).
 
-See [Detailed Deployment: Cost Analysis](deployment-detailed.md#cost-analysis) for scaling costs and optimisation strategies.
+See [Detailed Deployment: Cost Analysis](/docs/deployment-detailed/#cost-analysis) for scaling costs and optimisation strategies.
 
 ## 🏗️ Architecture at a Glance
 
@@ -105,7 +102,7 @@ See [Detailed Deployment: Cost Analysis](deployment-detailed.md#cost-analysis) f
 - Service Endpoints for optimised Azure service routing.
 - Fully idempotent deployment.
 
-See [Architecture Overview](architecture.md) for detailed component descriptions.
+See [Architecture Overview](/docs/architecture/) for detailed component descriptions.
 
 ## 🎯 Use Cases
 
@@ -139,18 +136,18 @@ See [Architecture Overview](architecture.md) for detailed component descriptions
 | **Azure subscription** | Required | Contributor or Owner role |
 | **Entra ID tenant** | Required | Usually available with Microsoft 365 |
 
-For full prerequisite details, see [Prerequisites Guide](prerequisites.md).
+For full prerequisite details, see [Prerequisites Guide](/docs/prerequisites/).
 
 ## 📘 Documentation & Resources
 
 ### Getting Started
 
-1. **New to this project?** Start with [Quick Start](quickstart.md).
-2. **Need environment setup?** See [Prerequisites](prerequisites.md).
-3. **Want to understand how it works?** Read [Architecture Overview](architecture.md).
-4. **Detailed walkthrough?** Follow [Detailed Deployment Guide](deployment-detailed.md).
-5. **Troubleshooting?** Check [Troubleshooting Guide](troubleshooting.md).
-6. **Using PowerShell scripts?** See [Scripts Reference](scripts.md).
+1. **New to this project?** Start with [Quick Start](/docs/quickstart/).
+2. **Need environment setup?** See [Prerequisites](/docs/prerequisites/).
+3. **Want to understand how it works?** Read [Architecture Overview](/docs/architecture/).
+4. **Detailed walkthrough?** Follow [Detailed Deployment Guide](/docs/deployment-detailed/).
+5. **Troubleshooting?** Check [Troubleshooting Guide](/docs/troubleshooting/).
+6. **Using PowerShell scripts?** See [Scripts Reference](/docs/scripts/).
 
 ### External Resources
 
@@ -162,10 +159,10 @@ For full prerequisite details, see [Prerequisites Guide](prerequisites.md).
 
 ### Project Documentation
 
-- [CONTRIBUTING](../CONTRIBUTING.md) – Contribution guidelines
-- [CHANGELOG](../CHANGELOG.md) – Version history and release notes
-- [LICENSE](../LICENSE) – MIT License
-- [README](../README.md) – Project overview
+- [CONTRIBUTING](https://github.com/markheydon/avd-occasional/blob/main/CONTRIBUTING.md) – Contribution guidelines
+- [CHANGELOG](https://github.com/markheydon/avd-occasional/blob/main/CHANGELOG.md) – Version history and release notes
+- [LICENSE](https://github.com/markheydon/avd-occasional/blob/main/LICENSE) – MIT License
+- [README](https://github.com/markheydon/avd-occasional/blob/main/README.md) – Project overview
 
 ### GitHub
 

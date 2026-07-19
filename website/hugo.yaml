@@ -1,0 +1,54 @@
+# Hugo configuration for AVD Occasional documentation site.
+baseURL: https://markheydon.github.io/avd-occasional/
+defaultContentLanguage: en
+languages:
+  en:
+    label: English (UK)
+    locale: en-GB
+    weight: 1
+title: AVD Occasional
+
+module:
+  imports:
+    - path: github.com/imfing/hextra
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    noClasses: false
+
+caches:
+  images:
+    dir: :cacheDir/images
+
+menu:
+  main:
+    - name: Documentation
+      pageRef: /docs
+      weight: 1
+    - name: Search
+      weight: 2
+      params:
+        type: search
+    - name: GitHub
+      weight: 3
+      url: https://github.com/markheydon/avd-occasional
+      params:
+        icon: github
+
+params:
+  description: Cost-effective Azure Virtual Desktop for occasional users
+
+  navbar:
+    displayTitle: true
+    displayLogo: false
+
+  footer:
+    displayCopyright: true
+    displayPoweredBy: true
+
+  editURL:
+    enable: true
+    base: https://github.com/markheydon/avd-occasional/edit/main/website/content

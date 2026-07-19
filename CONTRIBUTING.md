@@ -5,7 +5,7 @@ Thank you for your interest in improving this project! Contributions are welcome
 ## Before You Start
 
 - See [AGENTS.md](AGENTS.md) for project conventions and guidelines.
-- For end-user documentation support or clarifications, see [docs/](docs/) folder.
+- For end-user documentation support or clarifications, see the [documentation site](https://markheydon.github.io/avd-occasional) (`website/`).
 
 ## Issues
 
@@ -66,7 +66,7 @@ az resource list --resource-group avd-occasional-rg -o table
 - **Markdown documentation**: Use UK English conventions.
   - Spelling: "organisation", "customise", "colour".
   - Terminology: Consistent terminology throughout (e.g., "Entra ID" not "Azure AD").
-  - Links: Relative links between docs/ files; full URLs for external resources.
+  - Links: Relative links between `website/content/` pages; full URLs for external resources.
 
 ## Adding New Features
 
@@ -74,7 +74,7 @@ If adding new functionality:
 
 1. Update relevant Bicep modules in `infra/`.
 2. Update `infra/parameters.json` defaults if adding new parameters.
-3. Update documentation in `docs/` and `README.md` if user-facing.
+3. Update documentation in `website/content/` and `README.md` if user-facing.
 4. Test with multiple parameter configurations.
 5. Update `CHANGELOG.md` with your changes.
 
@@ -85,10 +85,29 @@ Documentation improvements are valuable! When updating docs:
 1. Use UK English spelling throughout.
 2. Ensure links between docs work correctly.
 3. Keep explanations clear and concise.
-4. Test that markdown renders correctly on GitHub.
+4. Preview the site locally before submitting (see below).
 5. Verify all code examples are copy-paste friendly.
 
-See [docs/](docs/) for documentation structure.
+### Previewing the documentation site locally
+
+The site is built with [Hugo](https://gohugo.io/) and the [Hextra](https://themes.gohugo.io/themes/hextra/) theme. You do not need a local Hugo install if you have Docker or Podman:
+
+```powershell
+# Live reload dev server at http://localhost:1313
+.\scripts\Invoke-HugoSite.ps1 serve
+
+# Build static output to website/public
+.\scripts\Invoke-HugoSite.ps1 build
+
+# Build then serve the production output via nginx at http://localhost:8080
+.\scripts\Invoke-HugoSite.ps1 preview
+```
+
+Use `-Runtime docker` if you use Docker Desktop instead of Podman.
+
+If Hugo is installed locally, you can also run `hugo server -D` from the `website/` directory.
+
+See [website/](website/) for site configuration and content structure.
 
 ## License
 
