@@ -85,7 +85,7 @@ Internet User
 **Session Host VMs**
 - Operating system: Windows 11 Enterprise (multi-session capable).
 - Count: Configurable (1–5, default: 1).
-- Size: `Standard_D2s_v3` (moderate) or `Standard_B2s` (light).
+- Size: `Standard_D2s_v5` (moderate) or `Standard_B2s` (light).
 - Boot method: UEFI with Secure Boot (Trusted Launch enabled).
 - OS disk: Standard SSD, 30 GB.
 - Boot diagnostics: Enabled (diagnostics logs to managed storage).
@@ -101,14 +101,14 @@ Internet User
 
 ## Cost Model
 
-**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publically in February 2026
+**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publicly in July 2026
 and are subject to change by Microsoft at any time. You should use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
 
 ### Monthly Costs by Component
 
 | Component | Deallocated | Running | Notes |
 |-----------|-----------|---------|-------|
-| **Session Host VM** | £0 | £90–120 | Largest cost driver (D2s_v3) |
+| **Session Host VM** | £0 | £90–120 | Largest cost driver (D2s_v5) |
 | **OS Disk** | £2–3 | £2–3 | Always charged |
 | **Public IP** | £0 | £2–3 | Deleted when stopped |
 | **Network & Services** | £0 | £0 | Free (VNet, NSG, AVD service) |
@@ -123,7 +123,7 @@ and are subject to change by Microsoft at any time. You should use the official 
 
 **Workload Sizing**
 - **Light workload**: `Standard_B2s` (~£35/month active).
-- **Moderate workload**: `Standard_D2s_v3` (~£100–120/month active).
+- **Moderate workload**: `Standard_D2s_v5` (~£100–120/month active).
 - Switch between sizes by editing `parameters.json` and redeploying.
 
 **Deallocate vs. Delete**
@@ -299,4 +299,4 @@ Starting March 31, 2026, Azure requires **explicit outbound connectivity** for n
 
 ---
 
-**Last Updated**: February 2026
+**Last Updated**: July 2026

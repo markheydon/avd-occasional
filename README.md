@@ -117,7 +117,7 @@ foreach ($vmId in $vmIds) {
 
 ## Estimated Cost at a Glance
 
-**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publically in February 2026 and are subject to change by Microsoft at any time. You should use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
+**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publicly in July 2026 and are subject to change by Microsoft at any time. You should use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
 
 | State | Monthly Cost | When To Use |
 |-------|-------------|-----------|
@@ -131,7 +131,7 @@ foreach ($vmId in $vmIds) {
 
 ## For Contributors
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on contributing improvements.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on contributing improvements. See [AGENTS.md](AGENTS.md) for conventions used by coding agents.
 
 ## License
 
@@ -139,4 +139,4 @@ MIT License – See [LICENSE](LICENSE) for details.
 
 ---
 
-**Last Updated**: February 2026  
+**Last Updated**: July 2026  

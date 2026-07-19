@@ -5,12 +5,17 @@ on:
     paths:
       - "infra/**"
       - "bicepconfig.json"
+      - "scripts/**"
   push:
     branches:
       - main
     paths:
       - "infra/**"
       - "bicepconfig.json"
+      - "scripts/**"
+
+permissions:
+  contents: read
 
 jobs:
   lint-build:
@@ -19,10 +24,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Install Azure CLI
-        run: |
-          set -euo pipefail
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      - name: Azure CLI version
+        run: az version
 
       - name: Bicep version
         run: az bicep version
@@ -44,3 +47,24 @@ jobs:
             echo "Building $file"
             az bicep build --file "$file" --stdout > /dev/null
           done
+
+  powershell-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+
+      - name: Analyse PowerShell scripts
+        shell: pwsh
+        run: |
+          $results = Invoke-ScriptAnalyzer -Path scripts -Recurse -Settings ./PSScriptAnalyzerSettings.psd1 -Severity Warning, Error
+          if ($results) {
+            $results | Format-Table -AutoSize
+            Write-Error "PSScriptAnalyzer found $($results.Count) issue(s)."
+          }

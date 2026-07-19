@@ -58,13 +58,13 @@ az login
 
 ## 💰 Cost Profile
 
-**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publically in February 2026
+**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publicly in July 2026
 and are subject to change by Microsoft at any time. You should use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
 
 | State | Monthly Cost | Notes |
 |-------|-------------|-------|
 | **Deallocated** | £2–3 | VMs stopped, disks retained (instant resume) |
-| **Running** | £94–126 | Full D2s_v3 compute (1 VM, moderate workload) |
+| **Running** | £94–126 | Full D2s_v5 compute (1 VM, moderate workload) |
 | **Deleted** | £0 | Complete removal (15–20 min redeploy) |
 | **Savings** | **~98%** | Cost reduction when deallocated vs running |
 
@@ -175,4 +175,4 @@ For full prerequisite details, see [Prerequisites Guide](prerequisites.md).
 
 ---
 
-**Last Updated**: February 2026  
+**Last Updated**: July 2026  

@@ -61,6 +61,32 @@ The deployment uses two extensions deployed in sequence on each VM:
 
 **Benefit:** Clean separation of concerns—Entra ID authentication is configured first, then AVD host pool registration follows. Deployment is reliable and works correctly on redeployment.
 
+### AVD DSC Artifact URL
+
+The `artifactsLocation` parameter in `infra/parameters.json` points to a pinned Microsoft gallery artifact ZIP used by the DSC extension to register session hosts with the host pool:
+
+```
+https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02774.414.zip
+```
+
+This URL is **not auto-updated**. Microsoft periodically publishes newer `Configuration_1.0.*.zip` artifacts with bug fixes and compatibility updates for AVD session host registration.
+
+**When to update:**
+
+- Session host provisioning fails during the DSC extension step.
+- Microsoft documentation or release notes reference a newer required artifact version.
+- You are troubleshooting persistent session host registration errors after verifying network and RBAC configuration.
+
+**How to check for a newer artifact:**
+
+1. Review the [AVD session host setup documentation](https://learn.microsoft.com/en-us/azure/virtual-desktop/set-up-session-hosts-automatically) for the current recommended artifact.
+2. Browse the [gallery artifacts container](https://wvdportalstorageblob.blob.core.windows.net/galleryartifacts/Configuration_1.0.02774.414.zip) parent path for newer `Configuration_1.0.*.zip` files.
+3. Update `artifactsLocation` in `infra/parameters.json` (or pass `-ArtifactsLocation` to the deploy script if supported).
+4. Redeploy or re-run the DSC extension on affected session hosts.
+5. Verify registration with `.\scripts\Test-AvdSessionHost.ps1`.
+
+Do not bump the artifact URL without testing a full deployment — newer artifacts may require matching Bicep API versions or extension settings.
+
 ### Explicit Outbound Connectivity (March 2026 Compliance)
 
 Starting March 31, 2026, Azure requires **explicit outbound connectivity methods** for new virtual networks. This template implements compliance through:
@@ -157,7 +183,7 @@ Edit `infra/parameters.json` to customize deployment:
 
 **Common Customisations:**
 
-**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publically in February 2026
+**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publicly in July 2026
 and are subject to change by Microsoft at any time. You should use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
 
 | Parameter | Options | Default | Cost Impact |
@@ -357,7 +383,7 @@ $adminPassword = Read-Host "Enter admin password" -AsSecureString
 
 **Cost impact:**
 - Light (B2s): ~£35/month active
-- Moderate (D2s_v3): ~£100–120/month active
+- Moderate (D2s_v5): ~£100–120/month active
 - Deallocated: ~£0 (same for both)
 
 **Note:** Existing VMs are replaced (not upgraded in-place). Redeploy may take longer as old VMs are removed first.
@@ -463,11 +489,11 @@ $adminPassword = Read-Host "Enter admin password" -AsSecureString
 
 ## Cost Analysis
 
-### Component Costs (UK Pricing, February 2026)
+### Component Costs (UK Pricing, July 2026)
 
 | Component | Deallocated | Active | Notes |
 |-----------|-----------|--------|-------|
-| **Session Host VM (D2s_v3, moderate)** | £0 | £90–120 | Largest cost driver |
+| **Session Host VM (D2s_v5, moderate)** | £0 | £90–120 | Largest cost driver |
 | **Session Host VM (B2s, light)** | £0 | £30–40 | For lighter workloads |
 | **OS Disk (Standard SSD)** | £2–3 | £2–3 | Always charged |
 | **Standard Public IP** | £0 | £2–3 | Deleted when stopped |
@@ -498,7 +524,7 @@ $adminPassword = Read-Host "Enter admin password" -AsSecureString
 - Best for: Monthly or less frequent use
 
 **Strategy 3: Light workload**
-- Switch from moderate (D2s_v3, £100–120/mo) to light (B2s, £35/mo)
+- Switch from moderate (D2s_v5, £100–120/mo) to light (B2s, £35/mo)
 - Requires 2–4 vCPU? Consider light
 - Less RAM (4GB vs 8GB)
 - Best for: Development, light document work
@@ -515,4 +541,4 @@ $adminPassword = Read-Host "Enter admin password" -AsSecureString
 
 ---
 
-**Last Updated**: February 2026
+**Last Updated**: July 2026

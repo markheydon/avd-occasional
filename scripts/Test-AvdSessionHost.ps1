@@ -46,8 +46,9 @@ if (-not $HostPoolName -or -not $VmName) {
     # Discover host pool if not specified
     if (-not $HostPoolName) {
         Write-Host "Discovering host pool..." -ForegroundColor Gray
-        $hostPoolsJson = az desktopvirtualization hostpool list `
+        $hostPoolsJson = az resource list `
             --resource-group $ResourceGroupName `
+            --resource-type "Microsoft.DesktopVirtualization/hostPools" `
             --query "[].name" `
             -o json 2>$null
         
@@ -128,7 +129,7 @@ foreach ($ext in $extensions) {
 
 # Check session host status
 Write-Host "`nChecking session host status in AVD..." -ForegroundColor Yellow
-$sessionHostUrl = "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$ResourceGroupName/providers/Microsoft.DesktopVirtualization/hostPools/$HostPoolName/sessionHosts?api-version=2023-09-05"
+$sessionHostUrl = "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$ResourceGroupName/providers/Microsoft.DesktopVirtualization/hostPools/$HostPoolName/sessionHosts?api-version=2024-04-03"
 
 $sessionHosts = az rest --method get --url $sessionHostUrl --query "value" -o json | ConvertFrom-Json
 $targetHost = $sessionHosts | Where-Object { $_.name -like "*$($VmName.Split('-')[0..3] -join '-')*" }
@@ -145,7 +146,7 @@ if ($targetHost) {
 
 # Check host pool RDP properties
 Write-Host "`nChecking host pool RDP properties..." -ForegroundColor Yellow
-$hostPoolUrl = "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$ResourceGroupName/providers/Microsoft.DesktopVirtualization/hostPools/$HostPoolName`?api-version=2023-09-05"
+$hostPoolUrl = "https://management.azure.com/subscriptions/$subscriptionId/resourceGroups/$ResourceGroupName/providers/Microsoft.DesktopVirtualization/hostPools/$HostPoolName`?api-version=2024-04-03"
 $hostPool = az rest --method get --url $hostPoolUrl -o json | ConvertFrom-Json
 
 $rdpProps = $hostPool.properties.customRdpProperty
