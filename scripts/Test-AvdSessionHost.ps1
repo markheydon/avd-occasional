@@ -46,8 +46,9 @@ if (-not $HostPoolName -or -not $VmName) {
     # Discover host pool if not specified
     if (-not $HostPoolName) {
         Write-Host "Discovering host pool..." -ForegroundColor Gray
-        $hostPoolsJson = az desktopvirtualization hostpool list `
+        $hostPoolsJson = az resource list `
             --resource-group $ResourceGroupName `
+            --resource-type "Microsoft.DesktopVirtualization/hostPools" `
             --query "[].name" `
             -o json 2>$null
         
