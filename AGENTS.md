@@ -81,3 +81,23 @@ Use these skills for specialised workflows:
 | `technical-writing` | Creating or editing `website/content/`, `README.md`, `CHANGELOG.md`, or other user-facing technical content |
 
 Skills live in `.agents/skills/<skill-name>/SKILL.md`.
+
+## Cursor Cloud specific instructions
+
+This repository has two parts: the Infrastructure-as-Code template (`infra/` Bicep + `scripts/` PowerShell) and the end-user documentation site (`website/`, a Hugo site published to GitHub Pages). Neither part is a conventional application server.
+
+The toolchain (Azure CLI with the Bicep CLI, PowerShell `pwsh`, the `PSScriptAnalyzer` module, Hugo extended, Dart Sass, and Go) is available in cloud sessions.
+
+### Infrastructure (`infra/`, `scripts/`)
+
+- Local validation matches CI (`.github/workflows/bicep-lint.yml`) and the commands in `CONTRIBUTING.md`. Lint and build every Bicep file with `az bicep lint --file <f>` and `az bicep build --file <f>`; analyse scripts with `Invoke-ScriptAnalyzer -Path scripts -Recurse -Settings ./PSScriptAnalyzerSettings.psd1 -Severity Warning, Error`.
+- `az bicep build --file infra/main.bicep` compiles the deployable ARM artifact; use it to confirm template changes without touching Azure.
+- All live actions require Azure credentials. `Deploy-AvdOccasional.ps1` (including `-WhatIf`), `Start-`/`Stop-`/`Remove-AvdOccasional.ps1`, and `Test-AvdSessionHost.ps1` call `az group`/`az vm`/`az deployment`, which fail with `Please run 'az login' to setup account.` until you run `az login` against a real Azure subscription. Cloud sessions have no subscription, so these are not runnable end-to-end here.
+- The Bicep CLI is separate from the Azure CLI package; if `az bicep` is missing, run `az bicep install` (the update script does this automatically).
+
+### Documentation site (`website/`)
+
+- The site is [Hugo](https://gohugo.io/) with the [Hextra](https://github.com/imfing/hextra) theme, imported as a Hugo/Go module (see `website/go.mod`); the build matches `.github/workflows/hugo.yaml`. Because Hextra is a module, the first `hugo` build resolves it via the Go module proxy and needs network access.
+- Hugo **extended** is required (Dart Sass processing); the plain Hugo build fails on the theme's SCSS. Run all Hugo commands from inside `website/`.
+- Preview locally with `hugo server -D` (from `website/`). Note the dev server is served under the `baseURL` subpath, i.e. `http://localhost:1313/avd-occasional/`, not the root `/` — requesting `/` returns 404. Build static output with `hugo --gc --minify` (outputs to `website/public`).
+- `scripts/Invoke-HugoSite.ps1` (the workflow documented in `README.md`) drives Hugo through a Docker/Podman container. Cloud sessions have Hugo installed natively but no container runtime, so prefer the native `hugo`/`hugo server` commands over that helper here.
