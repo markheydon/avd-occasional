@@ -9,12 +9,12 @@ Get your Azure Virtual Desktop environment running in approximately 5 minutes.
 
 Before starting, ensure you have:
 
-- ✅ Azure CLI v2.40+ installed.
-- ✅ Bicep CLI (included with Azure CLI v2.20+).
-- ✅ PowerShell 5.1+.
-- ✅ Azure subscription with Contributor role.
-- ✅ Entra ID user account.
-- ✅ Strong admin password for session hosts.
+- Azure CLI v2.40+ installed.
+- Bicep CLI (included with Azure CLI v2.20+).
+- PowerShell 5.1+.
+- Azure subscription with Contributor role.
+- Entra ID user account.
+- Strong admin password for session hosts.
 
 For detailed prerequisites, see [Prerequisites Guide](/docs/prerequisites/).
 
@@ -58,7 +58,9 @@ This creates all Azure Virtual Desktop resources: virtual network, host pool, se
 
 ## 3. Assign Role Permissions (Required)
 
-**⚠️ Users cannot connect without these role assignments.**
+{{< callout type="warning" >}}
+Users cannot connect without these role assignments.
+{{< /callout >}}
 
 Role assignments are manual post-deploy steps today. Automating them via Bicep is tracked in [issue #3](https://github.com/markheydon/avd-occasional/issues/3).
 
@@ -81,6 +83,10 @@ az role assignment create `
 
 Assign **one** of the following roles on each session host VM. You do not need both.
 
+{{< tabs >}}
+
+{{< tab name="User Login (default)" selected=true >}}
+
 #### Option A: Virtual Machine User Login (default)
 
 Standard user sign-in. Use this for occasional desktop use where you do not need to install software or change system settings.
@@ -96,6 +102,10 @@ foreach ($vmId in $vmIds) {
       --scope $vmId
 }
 ```
+
+{{< /tab >}}
+
+{{< tab name="Administrator Login" >}}
 
 #### Option B: Virtual Machine Administrator Login (developers)
 
@@ -119,7 +129,13 @@ To assign admin rights to a different user, replace the first line with:
 $userId = (az ad user show --id "you@yourtenant.onmicrosoft.com" --query id -o tsv)
 ```
 
-**Security note:** This role grants full local administrator access on the VM. Use it for personal development desktops; avoid it for shared or production-style hosts.
+{{< callout type="warning" >}}
+This role grants full local administrator access on the VM. Use it for personal development desktops; avoid it for shared or production-style hosts.
+{{< /callout >}}
+
+{{< /tab >}}
+
+{{< /tabs >}}
 
 **Alternative:** The `avdadmin` local account created during deployment also has administrator rights, but you must sign in with that separate account and password rather than your Entra ID credentials.
 
@@ -140,7 +156,9 @@ You're now connected and can start working!
 
 When finished working, deallocate VMs to save ~98% on compute costs:
 
-**⚠️ Your desktop, files, and applications are fully preserved. Only VM compute is paused, disks remain.**
+{{< callout type="info" >}}
+Your desktop, files, and applications are fully preserved. Only VM compute is paused; disks remain.
+{{< /callout >}}
 
 ```powershell
 .\scripts\Stop-AvdOccasional.ps1

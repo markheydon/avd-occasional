@@ -7,9 +7,13 @@ This guide provides comprehensive deployment instructions, architectural context
 
 ## Important Prerequisites
 
-⚠️ **This template deploys Entra ID-Joined session hosts.** VMs authenticate via cloud-based Entra ID (no on-premises AD required). See [Prerequisites Guide: Entra ID Authentication](/docs/prerequisites/#entra-id-authentication) for details.
+{{< callout type="important" >}}
+This template deploys Entra ID-joined session hosts. VMs authenticate via cloud-based Entra ID (no on-premises AD required). See [Prerequisites Guide: Entra ID Authentication](/docs/prerequisites/#entra-id-authentication) for details.
+{{< /callout >}}
 
-⚠️ **Role assignments are NOT automatic.** After deployment, users must be assigned two RBAC roles. See [Quick Start: Step 3](/docs/quickstart/#3-assign-role-permissions-required) for instructions.
+{{< callout type="warning" >}}
+Role assignments are **not** automatic. After deployment, users must be assigned two RBAC roles. See [Quick Start: Step 3](/docs/quickstart/#3-assign-role-permissions-required) for instructions.
+{{< /callout >}}
 
 ### Prerequisites Checklist
 
@@ -129,11 +133,14 @@ Starting March 31, 2026, Azure requires **explicit outbound connectivity methods
 - **IP Address Changes**: Public IPs get new addresses each start cycle (acceptable and expected for outbound-only connectivity).
 
 **Why This Approach:**
-- ✅ **Compliant** – Meets Azure's explicit outbound requirement.
-- ✅ **Cost-optimized** – £0/month when VMs stopped (vs ~£2–3/month if kept).
-- ✅ **Secure** – NSG blocks ALL inbound traffic; IPs are outbound-only.
-- ✅ **Automated** – Start/Stop scripts handle entire lifecycle.
-- ✅ **Fully functional** – Provides internet access for updates, DSC downloads, browsing.
+
+{{< callout type="info" >}}
+- **Compliant** – Meets Azure's explicit outbound requirement.
+- **Cost-optimised** – £0/month when VMs stopped (vs ~£2–3/month if kept).
+- **Secure** – NSG blocks ALL inbound traffic; IPs are outbound-only.
+- **Automated** – Start/Stop scripts handle entire lifecycle.
+- **Fully functional** – Provides internet access for updates, DSC downloads, browsing.
+{{< /callout >}}
 
 ---
 
@@ -197,8 +204,9 @@ Edit `infra/parameters.json` to customize deployment:
 
 **Common Customisations:**
 
-**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publicly in July 2026
-and are subject to change by Microsoft at any time. You should use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
+{{< callout type="important" >}}
+Costs are estimates, in GBP, based on pricing information available publicly in July 2026 and are subject to change by Microsoft at any time. Use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
+{{< /callout >}}
 
 | Parameter | Options | Default | Cost Impact |
 |-----------|---------|---------|------------|
@@ -313,7 +321,9 @@ az deployment group show --resource-group avd-occasional-rg `
 
 ### 9. Configure User Access (Required)
 
-**⚠️ CRITICAL:** Users cannot connect without these role assignments. Allow 5–10 minutes for propagation after assignment.
+{{< callout type="warning" >}}
+Users cannot connect without these role assignments. Allow 5–10 minutes for propagation after assignment.
+{{< /callout >}}
 
 Full instructions: [Quick Start: Step 3](/docs/quickstart/#3-assign-role-permissions-required) or [Prerequisites: Role Assignment Requirements](/docs/prerequisites/#role-assignment-requirements).
 

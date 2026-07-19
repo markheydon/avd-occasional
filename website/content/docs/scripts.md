@@ -326,7 +326,9 @@ Deallocated state is cost-optimised and can last indefinitely without additional
 - Cleaning up test deployments
 - Reducing to zero infrastructure cost
 
-**⚠️ WARNING:** Deletion is permanent. All VMs, disks, networking, and AVD resources will be deleted. Recovery is not possible.
+{{< callout type="error" >}}
+Deletion is permanent. All VMs, disks, networking, and AVD resources will be deleted. Recovery is not possible.
+{{< /callout >}}
 
 ### Basic Usage
 

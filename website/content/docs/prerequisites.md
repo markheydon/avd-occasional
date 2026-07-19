@@ -54,9 +54,9 @@ git --version
 
 ### Azure Subscription
 
-- ✅ Active Azure subscription.
-- ✅ **Contributor** or **Owner** role on the subscription.
-- ✅ Quota available for virtual machines in your chosen region.
+- Active Azure subscription.
+- **Contributor** or **Owner** role on the subscription.
+- Quota available for virtual machines in your chosen region.
 
 To verify your role:
 
@@ -66,9 +66,9 @@ az role assignment list --assignee (az account show --query user.name -o tsv) --
 
 ### Entra ID (Azure AD)
 
-- ✅ Entra ID tenant access (usually available to organisations using Microsoft 365).
-- ✅ User account in the Entra ID tenant.
-- ✅ Ability to create role assignments (typically available to Global Admins or subscription Owners).
+- Entra ID tenant access (usually available to organisations using Microsoft 365).
+- User account in the Entra ID tenant.
+- Ability to create role assignments (typically available to Global Admins or subscription Owners).
 
 To verify Entra ID access:
 
@@ -116,10 +116,10 @@ $adminPassword = Read-Host "Enter admin password for session hosts" -AsSecureStr
 
 This deployment uses **Entra ID-joined VMs**, which means:
 
-- ✅ VMs authenticate using cloud-based Entra ID identity (no on-premises AD required)
-- ✅ Users sign in with Entra ID credentials (same as Microsoft 365)
-- ✅ Supports modern authentication (passwordless, Windows Hello, FIDO2)
-- ✅ Automatic Windows Updates and cloud policies
+- VMs authenticate using cloud-based Entra ID identity (no on-premises AD required).
+- Users sign in with Entra ID credentials (same as Microsoft 365).
+- Supports modern authentication (passwordless, Windows Hello, FIDO2).
+- Automatic Windows Updates and cloud policies.
 
 **What this enables:**
 - Remote workers can connect without VPN

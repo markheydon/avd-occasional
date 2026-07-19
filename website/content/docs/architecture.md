@@ -97,8 +97,9 @@ flowchart TB
 
 ## Cost Model
 
-**⚠️ Important**: Costs are estimates, in GBP, based on pricing information available publicly in July 2026
-and are subject to change by Microsoft at any time. You should use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
+{{< callout type="important" >}}
+Costs are estimates, in GBP, based on pricing information available publicly in July 2026 and are subject to change by Microsoft at any time. Use the official [Azure Pricing Calculator](https://azure.microsoft.com/pricing/calculator/) to determine your potential costs before deployment.
+{{< /callout >}}
 
 ### Monthly Costs by Component
 
@@ -278,11 +279,13 @@ Starting March 31, 2026, Azure requires **explicit outbound connectivity** for n
 
 ### Why This Approach
 
-✅ **Compliant** – Meets March 2026 Azure requirements.  
-✅ **Cost-optimised** – IPs deleted when VMs stopped (saves ~£2–3/month).  
-✅ **Transparent** – All outbound routes visible and auditable.  
-✅ **Functional** – Full internet access for updates, downloads, browsing.  
-✅ **Secure** – Combined with NSG, provides tight security posture.
+{{< callout type="info" >}}
+- **Compliant** – Meets March 2026 Azure requirements.
+- **Cost-optimised** – IPs deleted when VMs stopped (saves ~£2–3/month).
+- **Transparent** – All outbound routes visible and auditable.
+- **Functional** – Full internet access for updates, downloads, browsing.
+- **Secure** – Combined with NSG, provides tight security posture.
+{{< /callout >}}
 
 ## Deployment Customisation Options
 
