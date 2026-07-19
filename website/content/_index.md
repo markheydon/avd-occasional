@@ -74,26 +74,7 @@ See [Detailed Deployment: Cost Analysis](/docs/deployment-detailed/#cost-analysi
 
 ## 🏗️ Architecture at a Glance
 
-```
-┌─────────────────────────────────────────┐
-│ Internet User                           │
-│ (Windows App or RDP Client)             │
-└──────────────────┬──────────────────────┘
-                   │
-        ▼ Secure reverse connection
-   ┌──────────────────────────────┐
-   │ Azure Virtual Desktop Service │
-   └──────────────────┬────────────┘
-                      │
-        ▼ Isolated virtual network
-   ┌─────────────────────────────────────┐
-   │ VNet: 10.0.0.0/16                   │
-   │ ├─ Session Host VM (Entra ID-joined)│
-   │ ├─ Public IP (outbound only)        │
-   │ ├─ NSG (inbound deny)               │
-   │ └─ Service Endpoints (free routes)  │
-   └─────────────────────────────────────┘
-```
+See the [Architecture Overview](/docs/architecture/#high-level-architecture) for the full diagram and component descriptions.
 
 **Key features:**
 - Entra ID-joined VMs (cloud-native, no VPN required).
@@ -101,8 +82,6 @@ See [Detailed Deployment: Cost Analysis](/docs/deployment-detailed/#cost-analysi
 - Public IPs deleted when VMs stopped (cost optimisation).
 - Service Endpoints for optimised Azure service routing.
 - Fully idempotent deployment.
-
-See [Architecture Overview](/docs/architecture/) for detailed component descriptions.
 
 ## 🎯 Use Cases
 

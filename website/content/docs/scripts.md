@@ -15,6 +15,20 @@ This guide documents the PowerShell scripts included in the `scripts/` folder an
 | `Remove-AvdOccasional.ps1` | Delete all resources permanently | When no longer needed |
 | `Test-AvdSessionHost.ps1` | Diagnose session host connectivity issues | When troubleshooting problems |
 
+## Lifecycle state machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Deployed: Deploy-AvdOccasional.ps1
+    Deployed --> Running: Start-AvdOccasional.ps1
+    Running --> Deallocated: Stop-AvdOccasional.ps1
+    Deallocated --> Running: Start-AvdOccasional.ps1
+    Deployed --> Deleted: Remove-AvdOccasional.ps1
+    Running --> Deleted: Remove-AvdOccasional.ps1
+    Deallocated --> Deleted: Remove-AvdOccasional.ps1
+    Deleted --> Deployed: Deploy-AvdOccasional.ps1
+```
+
 ## Deploy-AvdOccasional.ps1
 
 **Purpose:** Deploy or update Azure Virtual Desktop infrastructure using Bicep templates.

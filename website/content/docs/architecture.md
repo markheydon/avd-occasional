@@ -7,24 +7,22 @@ Understand the infrastructure components deployed by this template and how they 
 
 ## High-Level Architecture
 
-```
-Internet User
-    ↓
-[Azure Virtual Desktop Client]
-    ├─ Windows App (Recommended)
-    ├─ Web Client
-    └─ RDP Client
-    ↓
-[Azure Virtual Desktop Service]
-    (Secure reverse connection, no public IPs)
-    ↓
-[Azure Virtual Network (10.0.0.0/16)]
-    ├─ Subnet: 10.0.1.0/24
-    ├─ Session Host VMs (Entra ID joined)
-    ├─ Public IPs (outbound only)
-    └─ Network Security Group
-    ↓
-[Your Desktop Environment]
+```mermaid
+flowchart TB
+    User["Internet user"]
+    Client["AVD client<br/>(Windows App / Web / RDP)"]
+    AVD["Azure Virtual Desktop service"]
+    VNet["VNet 10.0.0.0/16"]
+    VM["Session host VM<br/>(Entra ID-joined)"]
+    NSG["NSG — inbound deny"]
+    PIP["Public IP — outbound only"]
+
+    User --> Client
+    Client -->|Secure reverse connection| AVD
+    AVD --> VNet
+    VNet --> VM
+    VM --- NSG
+    VM --- PIP
 ```
 
 **Key principle:** VMs do not accept inbound connections. All connections originate from the VM to the Azure Virtual Desktop service.
@@ -212,23 +210,40 @@ This template is **fully idempotent**:
 
 ## Resource Dependency Graph
 
-```
-Resource Group (avd-occasional-rg)
-├── Virtual Network
-│   ├── Subnet ──────────────────────────────┐
-│   └── Service Endpoints                    │
-├── Network Security Group ──────────────────┤
-├── Host Pool                                │
-├── Workspace ──→ Application Group ────────┐│
-│                                            ││
-├── Session Host VMs (1-5)                   ││
-│   ├─ Network Interface ←─────┬─────────────┘│
-│   ├─ Public IP (managed lifecycle)          │
-│   ├─ OS Disk                                │
-│   ├─ Managed Identity                       │
-│   └─ Custom Script Extension                │
-│       └─ [Installs AVD Agent via Host Pool←─┘
-│           Registration Token]
+```mermaid
+graph TD
+    RG["Resource Group"]
+    VNet["Virtual Network"]
+    Subnet["Subnet"]
+    SE["Service Endpoints"]
+    NSG["Network Security Group"]
+    HP["Host Pool"]
+    WS["Workspace"]
+    AG["Application Group"]
+    VM["Session Host VMs"]
+    NIC["Network Interface"]
+    PIP["Public IP"]
+    Disk["OS Disk"]
+    MI["Managed Identity"]
+    DSC["DSC Extension"]
+
+    RG --> VNet
+    VNet --> Subnet
+    VNet --> SE
+    RG --> NSG
+    RG --> HP
+    RG --> WS
+    WS --> AG
+    HP --> AG
+    RG --> VM
+    VM --> NIC
+    Subnet --> NIC
+    NSG --> NIC
+    VM --> PIP
+    VM --> Disk
+    VM --> MI
+    VM --> DSC
+    HP -->|Registration token| DSC
 ```
 
 **Deployment order:**
