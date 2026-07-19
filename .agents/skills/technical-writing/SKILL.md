@@ -2,7 +2,7 @@
 name: technical-writing
 description: >-
   Writes developer documentation, tutorials, ADRs, and blog posts for this repo.
-  Use when creating or editing docs/, README.md, CHANGELOG.md, or user-facing
+  Use when creating or editing website/content/, README.md, CHANGELOG.md, or user-facing
   technical content.
 ---
 

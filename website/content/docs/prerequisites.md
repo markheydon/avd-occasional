@@ -1,11 +1,25 @@
 ---
-layout: default
 title: Prerequisites
+weight: 10
 ---
 
-# Prerequisites
-
 Before deploying Azure Virtual Desktop, ensure your environment is properly configured.
+
+## Prerequisites flow
+
+```mermaid
+flowchart LR
+    Tools["Local tools<br/>CLI, Bicep, PowerShell, Git"]
+    Azure["Azure subscription<br/>Contributor role"]
+    Entra["Entra ID tenant"]
+    Roles["RBAC roles<br/>(post-deploy)"]
+    Ready["Ready to deploy"]
+
+    Tools --> Azure
+    Azure --> Entra
+    Entra --> Roles
+    Roles --> Ready
+```
 
 ## System Requirements
 
@@ -40,9 +54,9 @@ git --version
 
 ### Azure Subscription
 
-- ✅ Active Azure subscription.
-- ✅ **Contributor** or **Owner** role on the subscription.
-- ✅ Quota available for virtual machines in your chosen region.
+- Active Azure subscription.
+- **Contributor** or **Owner** role on the subscription.
+- Quota available for virtual machines in your chosen region.
 
 To verify your role:
 
@@ -52,9 +66,9 @@ az role assignment list --assignee (az account show --query user.name -o tsv) --
 
 ### Entra ID (Azure AD)
 
-- ✅ Entra ID tenant access (usually available to organisations using Microsoft 365).
-- ✅ User account in the Entra ID tenant.
-- ✅ Ability to create role assignments (typically available to Global Admins or subscription Owners).
+- Entra ID tenant access (usually available to organisations using Microsoft 365).
+- User account in the Entra ID tenant.
+- Ability to create role assignments (typically available to Global Admins or subscription Owners).
 
 To verify Entra ID access:
 
@@ -102,10 +116,10 @@ $adminPassword = Read-Host "Enter admin password for session hosts" -AsSecureStr
 
 This deployment uses **Entra ID-joined VMs**, which means:
 
-- ✅ VMs authenticate using cloud-based Entra ID identity (no on-premises AD required)
-- ✅ Users sign in with Entra ID credentials (same as Microsoft 365)
-- ✅ Supports modern authentication (passwordless, Windows Hello, FIDO2)
-- ✅ Automatic Windows Updates and cloud policies
+- VMs authenticate using cloud-based Entra ID identity (no on-premises AD required).
+- Users sign in with Entra ID credentials (same as Microsoft 365).
+- Supports modern authentication (passwordless, Windows Hello, FIDO2).
+- Automatic Windows Updates and cloud policies.
 
 **What this enables:**
 - Remote workers can connect without VPN
@@ -133,7 +147,7 @@ The `avdadmin` local account created during deployment is separate from Entra ID
 
 ### Assigning Roles
 
-See [Quick Start: Step 3](quickstart.md#3-assign-role-permissions-required) for automated commands, or follow the manual steps below.
+See [Quick Start: Step 3](/docs/quickstart/#3-assign-role-permissions-required) for automated commands, or follow the manual steps below.
 
 Role assignments are manual post-deploy steps today. Automating them via Bicep is tracked in [issue #3](https://github.com/markheydon/avd-occasional/issues/3).
 
@@ -211,7 +225,7 @@ foreach ($vmId in $vmIds) {
 }
 ```
 
-See [Quick Start: Role 2](quickstart.md#role-2-vm-sign-in-session-host-vms) for guidance on choosing between these roles.
+See [Quick Start: Role 2](/docs/quickstart/#role-2-vm-sign-in-session-host-vms) for guidance on choosing between these roles.
 
 ### Assigning Roles to Multiple Users
 
@@ -242,11 +256,11 @@ The VMs' Network Security Group allows all outbound traffic by default.
 
 ## Post-Deployment Verification
 
-After reviewing prerequisites, you're ready to deploy. Start with the [Quick Start Guide](quickstart.md).
+After reviewing prerequisites, you're ready to deploy. Start with the [Quick Start Guide](/docs/quickstart/).
 
 ---
 
-**Next**: [Quick Start Guide](quickstart.md)
+**Next**: [Quick Start Guide](/docs/quickstart/)
 
 ---
 
