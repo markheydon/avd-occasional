@@ -1,9 +1,7 @@
 ---
-layout: default
 title: Architecture Overview
+weight: 30
 ---
-
-# Architecture Overview
 
 Understand the infrastructure components deployed by this template and how they work together to provide a secure, cost-optimised Azure Virtual Desktop environment.
 
@@ -141,7 +139,7 @@ and are subject to change by Microsoft at any time. You should use the official 
 - No VPN or directory synchronisation required.
 
 **Role-Based Access Control (RBAC)**
-- Users must have two roles assigned (see [Prerequisites](prerequisites.md) for details):
+- Users must have two roles assigned (see [Prerequisites](/docs/prerequisites/) for details):
   - **Desktop Virtualization User** – Access AVD workspace.
   - **Virtual Machine User Login** – Log into VMs.
 - Roles are independently assignable (granular access control).
@@ -166,7 +164,7 @@ and are subject to change by Microsoft at any time. You should use the official 
 **Administrative Access**
 - No RDP ports exposed publicly.
 - No SSH or Bastion access by default.
-- **Entra ID admin on the VM:** Assign the **Virtual Machine Administrator Login** Azure RBAC role on each session host after deployment. This is the supported way to sign in with your Entra account and local administrator rights. See [Quick Start: Role 2](quickstart.md#role-2-vm-sign-in-session-host-vms).
+- **Entra ID admin on the VM:** Assign the **Virtual Machine Administrator Login** Azure RBAC role on each session host after deployment. This is the supported way to sign in with your Entra account and local administrator rights. See [Quick Start: Role 2](/docs/quickstart/#role-2-vm-sign-in-session-host-vms).
 - **Local break-glass account:** The `avdadmin` account created at deployment time has local administrator rights but is a separate sign-in identity from Entra ID.
 
 ### Compliance Features
@@ -293,10 +291,10 @@ Starting March 31, 2026, Azure requires **explicit outbound connectivity** for n
 
 ## Related Documentation
 
-- [Quick Start](quickstart.md) – Deployment steps
-- [Deployment Details](deployment-detailed.md) – Technical deployment walkthrough
-- [Troubleshooting](troubleshooting.md) – Common issues and solutions
-- [Scripts Reference](scripts.md) – PowerShell commands for lifecycle management
+- [Quick Start](/docs/quickstart/) – Deployment steps
+- [Deployment Details](/docs/deployment-detailed/) – Technical deployment walkthrough
+- [Troubleshooting](/docs/troubleshooting/) – Common issues and solutions
+- [Scripts Reference](/docs/scripts/) – PowerShell commands for lifecycle management
 
 ---
 

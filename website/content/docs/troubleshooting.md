@@ -1,9 +1,7 @@
 ---
-layout: default
 title: Troubleshooting
+weight: 60
 ---
-
-# Troubleshooting Guide
 
 Solutions for common issues encountered during deployment and operation.
 
@@ -174,7 +172,7 @@ Review the **Recommendations** section in script output for next steps. Then con
 **Solutions:**
 
 1. Check the DSC extension status in Azure Portal (VM → Extensions).
-2. Verify the `artifactsLocation` value in `infra/parameters.json` — see [AVD DSC Artifact URL](deployment-detailed.md#avd-dsc-artifact-url) for how to update it.
+2. Verify the `artifactsLocation` value in `infra/parameters.json` — see [AVD DSC Artifact URL](/docs/deployment-detailed/#avd-dsc-artifact-url) for how to update it.
 3. Confirm outbound connectivity (public IP on NIC, NSG allows required egress).
 4. Redeploy or re-run the DSC extension after updating the artifact URL.
 
@@ -551,7 +549,7 @@ If you cannot resolve the issue:
 
 ---
 
-**Next**: [PowerShell Scripts Reference](scripts.md)
+**Next**: [PowerShell Scripts Reference](/docs/scripts/)
 
 ---
 

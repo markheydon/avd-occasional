@@ -10,7 +10,9 @@ Cost-effective **Azure Virtual Desktop** infrastructure for occasional remote wo
 
 ## Documentation
 
-For full documentation, guides, and troubleshooting, visit the [docs](https://markheydon.github.io/avd-occasional).
+For full documentation, guides, and troubleshooting, visit the [documentation site](https://markheydon.github.io/avd-occasional).
+
+To preview docs locally (requires Docker or Podman): `.\scripts\Invoke-HugoSite.ps1 serve`
 
 ## Key Features
 
@@ -93,7 +95,7 @@ Assign the required roles to your Entra ID user for VM login and AVD access. You
 - **Virtual Machine User Login** – Standard user (default).
 - **Virtual Machine Administrator Login** – Local admin while signed in with Entra ID (for developers).
 
-See [Quick Start: Step 3](docs/quickstart.md#3-assign-role-permissions-required) for full commands, including the optional administrator role.
+See [Quick Start: Step 3](https://markheydon.github.io/avd-occasional/docs/quickstart/#3-assign-role-permissions-required) for full commands, including the optional administrator role.
 
 ```powershell
 # Get current user

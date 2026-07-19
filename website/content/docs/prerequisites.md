@@ -1,9 +1,7 @@
 ---
-layout: default
 title: Prerequisites
+weight: 10
 ---
-
-# Prerequisites
 
 Before deploying Azure Virtual Desktop, ensure your environment is properly configured.
 
@@ -133,7 +131,7 @@ The `avdadmin` local account created during deployment is separate from Entra ID
 
 ### Assigning Roles
 
-See [Quick Start: Step 3](quickstart.md#3-assign-role-permissions-required) for automated commands, or follow the manual steps below.
+See [Quick Start: Step 3](/docs/quickstart/#3-assign-role-permissions-required) for automated commands, or follow the manual steps below.
 
 Role assignments are manual post-deploy steps today. Automating them via Bicep is tracked in [issue #3](https://github.com/markheydon/avd-occasional/issues/3).
 
@@ -211,7 +209,7 @@ foreach ($vmId in $vmIds) {
 }
 ```
 
-See [Quick Start: Role 2](quickstart.md#role-2-vm-sign-in-session-host-vms) for guidance on choosing between these roles.
+See [Quick Start: Role 2](/docs/quickstart/#role-2-vm-sign-in-session-host-vms) for guidance on choosing between these roles.
 
 ### Assigning Roles to Multiple Users
 
@@ -242,11 +240,11 @@ The VMs' Network Security Group allows all outbound traffic by default.
 
 ## Post-Deployment Verification
 
-After reviewing prerequisites, you're ready to deploy. Start with the [Quick Start Guide](quickstart.md).
+After reviewing prerequisites, you're ready to deploy. Start with the [Quick Start Guide](/docs/quickstart/).
 
 ---
 
-**Next**: [Quick Start Guide](quickstart.md)
+**Next**: [Quick Start Guide](/docs/quickstart/)
 
 ---
 
