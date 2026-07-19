@@ -14,8 +14,8 @@ on:
       - "bicepconfig.json"
       - "scripts/**"
 
-env:
-  AZURE_CLI_VERSION: "2.75.0"
+permissions:
+  contents: read
 
 jobs:
   lint-build:
@@ -24,13 +24,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Install Azure CLI
-        run: |
-          set -euo pipefail
-          curl -sL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft.gpg
-          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
-          sudo apt-get update
-          sudo apt-get install -y "azure-cli=${AZURE_CLI_VERSION}-1~$(lsb_release -cs)"
+      - name: Azure CLI version
+        run: az version
 
       - name: Bicep version
         run: az bicep version
@@ -68,7 +63,7 @@ jobs:
       - name: Analyse PowerShell scripts
         shell: pwsh
         run: |
-          $results = Invoke-ScriptAnalyzer -Path scripts -Recurse -Severity Warning, Error
+          $results = Invoke-ScriptAnalyzer -Path scripts -Recurse -Settings ./PSScriptAnalyzerSettings.psd1 -Severity Warning, Error
           if ($results) {
             $results | Format-Table -AutoSize
             Write-Error "PSScriptAnalyzer found $($results.Count) issue(s)."
