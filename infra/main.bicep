@@ -53,7 +53,7 @@ var uniqueSuffix = uniqueString(resourceGroup().id)
 // SKU mapping based on workload size
 var vmSkuMap = {
   light: 'Standard_B2s'
-  moderate: 'Standard_D2s_v3'
+  moderate: 'Standard_D2s_v5'
 }
 var vmSku = vmSkuMap[workloadSize]
 

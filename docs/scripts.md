@@ -53,7 +53,7 @@ $adminPassword = Read-Host "Enter password" -AsSecureString
 | `AdminPassword` | SecureString | (prompted) | No* | VM admin password. If not supplied, prompted interactively. |
 | `AdminUsername` | String | `avdadmin` | No | VM admin username. Alphanumeric, can contain `.`, `-`, `_`. |
 | `Environment` | String | `dev` | No | Environment name prefix for resources (`dev`, `test`, `prod`). |
-| `WorkloadSize` | String | `moderate` | No | VM SKU: `light` (B2s, ~£35/mo) or `moderate` (D2s_v3, ~£100/mo). |
+| `WorkloadSize` | String | `moderate` | No | VM SKU: `light` (B2s, ~£35/mo) or `moderate` (D2s_v5, ~£100/mo). |
 | `VmCount` | Int | `1` | No | Number of session host VMs (1–5). Each adds ~£100/mo active. |
 | `Location` | String | `ukwest` | No | Azure region (e.g., `northeurope`, `eastus`). |
 | `WhatIf` | Switch | N/A | No | Preview changes without applying. Use with `-WhatIf -Verbose` for detailed output. |
@@ -573,4 +573,4 @@ See [Troubleshooting Guide: Script Issues](troubleshooting.md#script--automation
 
 ---
 
-**Last Updated**: February 2026
+**Last Updated**: July 2026

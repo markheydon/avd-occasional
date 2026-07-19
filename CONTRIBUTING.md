@@ -4,7 +4,7 @@ Thank you for your interest in improving this project! Contributions are welcome
 
 ## Before You Start
 
-- See [.github/copilot-instructions.md](.github/copilot-instructions.md) for project conventions and guidelines.
+- See [AGENTS.md](AGENTS.md) for project conventions and guidelines.
 - For end-user documentation support or clarifications, see [docs/](docs/) folder.
 
 ## Issues
@@ -50,14 +50,14 @@ az resource list --resource-group avd-occasional-rg -o table
 
 ## Code Style
 
-- **Bicep files**: Follow [.github/copilot-instructions.md](.github/copilot-instructions.md)
+- **Bicep files**: Follow [AGENTS.md](AGENTS.md)
   - Use `camelCase` for parameters and variables.
   - Use `PascalCase` for resource names.
   - Add `@description()` decorators to all parameters and outputs.
   - Use comments for non-obvious logic.
   - Keep modules focused (one responsibility).
 
-- **PowerShell scripts**: Follow [.github/copilot-instructions.md](.github/copilot-instructions.md)
+- **PowerShell scripts**: Follow [AGENTS.md](AGENTS.md)
   - Use Verb-AvdOccasional naming pattern for scripts.
   - Use approved PowerShell verbs (Deploy, Start, Stop, Remove).
   - Use `PascalCase` for parameter names.

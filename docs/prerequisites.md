@@ -225,4 +225,4 @@ After reviewing prerequisites, you're ready to deploy. Start with the [Quick Sta
 
 ---
 
-**Last Updated**: February 2026
+**Last Updated**: July 2026

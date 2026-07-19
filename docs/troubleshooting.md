@@ -38,7 +38,7 @@ az provider show --namespace Microsoft.Compute `
    - Navigate to **Quotas** (search bar)
    - Select **Compute** and your region
    - Click quota item and select "+ New Quota Request"
-   - Request increase for D2s_v3 VMs (or B2s for light workload)
+   - Request increase for D2s_v5 VMs (or B2s for light workload)
 
 3. Register required resource providers:
 ```powershell
@@ -161,6 +161,22 @@ The script checks:
 - AVD agent heartbeat (last reported time).
 
 Review the **Recommendations** section in script output for next steps. Then consult the relevant troubleshooting section below for detailed solutions.
+
+### Error: DSC extension fails or session host does not register
+
+**Symptoms:** Deployment succeeds but the session host never appears in the host pool, or the DSC extension reports failure.
+
+**Causes:**
+- Outdated `artifactsLocation` URL in `parameters.json`.
+- Network connectivity issues preventing DSC artifact download.
+- Registration token expired before DSC ran.
+
+**Solutions:**
+
+1. Check the DSC extension status in Azure Portal (VM → Extensions).
+2. Verify the `artifactsLocation` value in `infra/parameters.json` — see [AVD DSC Artifact URL](deployment-detailed.md#avd-dsc-artifact-url) for how to update it.
+3. Confirm outbound connectivity (public IP on NIC, NSG allows required egress).
+4. Redeploy or re-run the DSC extension after updating the artifact URL.
 
 ---
 
@@ -539,4 +555,4 @@ If you cannot resolve the issue:
 
 ---
 
-**Last Updated**: February 2026
+**Last Updated**: July 2026

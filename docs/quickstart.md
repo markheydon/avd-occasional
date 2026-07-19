@@ -117,4 +117,4 @@ See [Troubleshooting Guide](troubleshooting.md) for common problems and solution
 
 ---
 
-**Last Updated**: February 2026
+**Last Updated**: July 2026

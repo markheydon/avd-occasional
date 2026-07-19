@@ -5,12 +5,17 @@ on:
     paths:
       - "infra/**"
       - "bicepconfig.json"
+      - "scripts/**"
   push:
     branches:
       - main
     paths:
       - "infra/**"
       - "bicepconfig.json"
+      - "scripts/**"
+
+env:
+  AZURE_CLI_VERSION: "2.75.0"
 
 jobs:
   lint-build:
@@ -22,7 +27,10 @@ jobs:
       - name: Install Azure CLI
         run: |
           set -euo pipefail
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+          curl -sL https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft.gpg
+          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/azure-cli.list
+          sudo apt-get update
+          sudo apt-get install -y "azure-cli=${AZURE_CLI_VERSION}-1~$(lsb_release -cs)"
 
       - name: Bicep version
         run: az bicep version
@@ -44,3 +52,24 @@ jobs:
             echo "Building $file"
             az bicep build --file "$file" --stdout > /dev/null
           done
+
+  powershell-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+          Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+
+      - name: Analyse PowerShell scripts
+        shell: pwsh
+        run: |
+          $results = Invoke-ScriptAnalyzer -Path scripts -Recurse -Severity Warning, Error
+          if ($results) {
+            $results | Format-Table -AutoSize
+            Write-Error "PSScriptAnalyzer found $($results.Count) issue(s)."
+          }
