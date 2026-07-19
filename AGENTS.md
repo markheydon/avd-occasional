@@ -81,3 +81,14 @@ Use these skills for specialised workflows:
 | `technical-writing` | Creating or editing `docs/`, `README.md`, `CHANGELOG.md`, or other user-facing technical content |
 
 Skills live in `.agents/skills/<skill-name>/SKILL.md`.
+
+## Cursor Cloud specific instructions
+
+This is an Infrastructure-as-Code repository, not a running application: there is no long-lived server, database, or web UI to start. "Running" the project means validating and compiling the Bicep templates and PowerShell scripts.
+
+The toolchain (Azure CLI with the Bicep CLI, PowerShell `pwsh`, and the `PSScriptAnalyzer` module) is provisioned by the startup update script, so it is already available in cloud sessions.
+
+- Local validation matches CI (`.github/workflows/bicep-lint.yml`) and the commands in `CONTRIBUTING.md`. Lint and build every Bicep file with `az bicep lint --file <f>` and `az bicep build --file <f>`; analyse scripts with `Invoke-ScriptAnalyzer -Path scripts -Recurse -Settings ./PSScriptAnalyzerSettings.psd1 -Severity Warning, Error`.
+- `az bicep build --file infra/main.bicep` compiles the deployable ARM artifact; use it to confirm template changes without touching Azure.
+- All live actions require Azure credentials. `Deploy-AvdOccasional.ps1` (including `-WhatIf`), `Start-`/`Stop-`/`Remove-AvdOccasional.ps1`, and `Test-AvdSessionHost.ps1` call `az group`/`az vm`/`az deployment`, which fail with `Please run 'az login' to setup account.` until you run `az login` against a real Azure subscription. Cloud sessions have no subscription, so these are not runnable end-to-end here.
+- The Bicep CLI is separate from the Azure CLI package; if `az bicep` is missing, run `az bicep install` (the update script does this automatically).
