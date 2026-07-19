@@ -166,7 +166,8 @@ and are subject to change by Microsoft at any time. You should use the official 
 **Administrative Access**
 - No RDP ports exposed publicly.
 - No SSH or Bastion access by default.
-- Administrative tasks done via Azure Portal or PowerShell (through Entra ID).
+- **Entra ID admin on the VM:** Assign the **Virtual Machine Administrator Login** Azure RBAC role on each session host after deployment. This is the supported way to sign in with your Entra account and local administrator rights. See [Quick Start: Role 2](quickstart.md#role-2-vm-sign-in-session-host-vms).
+- **Local break-glass account:** The `avdadmin` account created at deployment time has local administrator rights but is a separate sign-in identity from Entra ID.
 
 ### Compliance Features
 
