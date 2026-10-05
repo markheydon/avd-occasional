@@ -13,10 +13,11 @@ updates:
     assignees:
       - "markheydon"
     groups:
-      actions:
+      github-actions:
         patterns:
-          - ".*"
+          - "*"
         update-types:
+          - "major"
           - "minor"
           - "patch"
   - package-ecosystem: "devcontainers"
@@ -31,3 +32,10 @@ updates:
       - "dependencies"
     assignees:
       - "markheydon"
+    groups:
+      devcontainers:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
